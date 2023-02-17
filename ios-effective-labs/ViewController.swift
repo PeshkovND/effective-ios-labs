@@ -1,13 +1,21 @@
-//
-//  ViewController.swift
-//  ios-effective-labs
-//
-//  Created by test on 17.02.2023.
-//
-
 import UIKit
+import CollectionViewPagingLayout
 
 class ViewController: UIViewController {
+    
+    var collectionView: UICollectionView!
+    
+    private func setupCollectionView() {
+        let layout = CollectionViewPagingLayout()
+        collectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .none
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isPagingEnabled = true
+        collectionView.register(MainCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.dataSource = self
+        view.addSubview(collectionView)
+    }
     
     let logoView: UIImageView = {
         let logoView = UIImageView()
@@ -30,6 +38,7 @@ class ViewController: UIViewController {
         view.backgroundColor = UIColor.darkGray
         view.addSubview(logoView)
         view.addSubview(mainLabel)
+        setupCollectionView()
         setupConstraints()
         // Do any additional setup after loading the view.
     }
@@ -42,17 +51,22 @@ class ViewController: UIViewController {
         
         mainLabel.topAnchor.constraint(equalTo: logoView.bottomAnchor, constant: 10).isActive = true
         mainLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
+        
+        collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: 30).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 0).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
+    }
+}
+
+extension ViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MainCell
+        return cell
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        10
     }
-    */
-
+    
 }
