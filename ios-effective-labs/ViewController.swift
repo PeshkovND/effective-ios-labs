@@ -7,6 +7,10 @@ class ViewController: UIViewController {
     
     let characters = CharactersMocks()
     
+    let colors: [UIColor] = [.yellow, .blue, .purple, .red, .orange, .green]
+    
+    var triangle: Triangle!
+    
     private func setupCollectionView() {
         let layout = CollectionViewPagingLayout()
         collectionView = UICollectionView(frame: view.frame, collectionViewLayout: layout)
@@ -16,7 +20,7 @@ class ViewController: UIViewController {
         collectionView.isPagingEnabled = true
         collectionView.register(MainCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.dataSource = self
-        view.addSubview(collectionView)
+        collectionView.delegate = self
     }
     
     let logoView: UIImageView = {
@@ -37,14 +41,22 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.darkGray
-        view.addSubview(logoView)
-        view.addSubview(mainLabel)
+        triangle = Triangle(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height))
+        triangle.backgroundColor = colors[0]
+        view.addSubview(triangle)
+        triangle.addSubview(logoView)
+        triangle.addSubview(mainLabel)
         setupCollectionView()
+        triangle.addSubview(collectionView)
         setupConstraints()
-        // Do any additional setup after loading the view.
     }
     
+    func findCenterIndex() -> IndexPath? {
+        let center = self.view.convert(self.collectionView.center, to: self.collectionView)
+        let index = collectionView!.indexPathForItem(at: center)
+        return index
+    }
+
     func setupConstraints() {
         logoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         logoView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
@@ -61,7 +73,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! MainCell
         let character = characters.characters[indexPath.item]
@@ -71,5 +83,13 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         characters.characters.count
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if scrollView == collectionView {
+            let index = findCenterIndex()
+            guard let index = index else { return }
+            triangle.backgroundColor = colors[index.item]
+        }
     }
 }

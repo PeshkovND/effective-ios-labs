@@ -30,6 +30,11 @@ class MainCell: UICollectionViewCell {
         setupConstraints()
     }
     
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
+    
     private func setupConstraints(){
         card.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
         card.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
@@ -45,10 +50,7 @@ class MainCell: UICollectionViewCell {
         cardLabel.leftAnchor.constraint(equalTo: cardImage.leftAnchor, constant: 15).isActive = true
         cardLabel.rightAnchor.constraint(equalTo: cardImage.rightAnchor, constant: -15).isActive = true
     }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
+
     
     func setup(name: String, image: String) {
         cardImage.image = UIImage(named: image)
