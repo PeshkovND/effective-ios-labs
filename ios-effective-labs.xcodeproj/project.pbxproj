@@ -13,6 +13,8 @@
 		52B564FF299F7D6A00295B7F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B564FE299F7D6A00295B7F /* ViewController.swift */; };
 		52E3C6E4299FCC8600D7C18F /* CollectionViewPagingLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 52E3C6E3299FCC8600D7C18F /* CollectionViewPagingLayout */; };
 		52E3C6E6299FCE0C00D7C18F /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E3C6E5299FCE0C00D7C18F /* MainCell.swift */; };
+		52E5079329A0C11D0076F85E /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079229A0C11D0076F85E /* Character.swift */; };
+		52E5079529A0C1740076F85E /* CharactersMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079429A0C1740076F85E /* CharactersMocks.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,8 @@
 		52B564F4299E1C1700295B7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		52B564FE299F7D6A00295B7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		52E3C6E5299FCE0C00D7C18F /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
+		52E5079229A0C11D0076F85E /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
+		52E5079429A0C1740076F85E /* CharactersMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersMocks.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,7 @@
 		52B564E5299E1C1600295B7F /* ios-effective-labs */ = {
 			isa = PBXGroup;
 			children = (
+				52E5079129A0C1010076F85E /* Model */,
 				52B564E6299E1C1600295B7F /* AppDelegate.swift */,
 				52B564E8299E1C1600295B7F /* SceneDelegate.swift */,
 				52B564EF299E1C1700295B7F /* Assets.xcassets */,
@@ -64,6 +69,15 @@
 				52E3C6E5299FCE0C00D7C18F /* MainCell.swift */,
 			);
 			path = "ios-effective-labs";
+			sourceTree = "<group>";
+		};
+		52E5079129A0C1010076F85E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				52E5079229A0C11D0076F85E /* Character.swift */,
+				52E5079429A0C1740076F85E /* CharactersMocks.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,8 +157,10 @@
 			files = (
 				52B564E7299E1C1600295B7F /* AppDelegate.swift in Sources */,
 				52B564FF299F7D6A00295B7F /* ViewController.swift in Sources */,
+				52E5079329A0C11D0076F85E /* Character.swift in Sources */,
 				52E3C6E6299FCE0C00D7C18F /* MainCell.swift in Sources */,
 				52B564E9299E1C1600295B7F /* SceneDelegate.swift in Sources */,
+				52E5079529A0C1740076F85E /* CharactersMocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
