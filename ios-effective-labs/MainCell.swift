@@ -1,32 +1,37 @@
 import UIKit
 import CollectionViewPagingLayout
 
-class MainCell: UICollectionViewCell {
+final class MainCell: UICollectionViewCell {
     
-    var card: UIView!
-    var cardImage: UIImageView!
-    var cardLabel: UILabel!
+    var cardContainerView: UIView = {
+        let cardContainerView = UIView()
+        cardContainerView.translatesAutoresizingMaskIntoConstraints = false
+        cardContainerView.layer.cornerRadius = 30
+        cardContainerView.clipsToBounds = true
+        return cardContainerView
+    }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        card = UIView()
-        card.translatesAutoresizingMaskIntoConstraints = false
-        card.layer.cornerRadius = 30
-        card.clipsToBounds = true
-        contentView.addSubview(card)
-        
-        cardImage = UIImageView()
-        cardImage.translatesAutoresizingMaskIntoConstraints = false
-        cardImage.contentMode = .scaleAspectFill
-        card.addSubview(cardImage)
-        
-        cardLabel = UILabel()
+    var cardImageView: UIImageView = {
+        let cardImageView = UIImageView()
+        cardImageView.translatesAutoresizingMaskIntoConstraints = false
+        cardImageView.contentMode = .scaleAspectFill
+        return cardImageView
+    }()
+    
+    var cardLabel: UILabel = {
+        let cardLabel = UILabel()
         cardLabel.translatesAutoresizingMaskIntoConstraints = false
         cardLabel.textColor = .white
         cardLabel.font = UIFont.boldSystemFont(ofSize: 24)
         cardLabel.numberOfLines = 0
-        cardImage.addSubview(cardLabel)
-        
+        return cardLabel
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.addSubview(cardContainerView)
+        cardContainerView.addSubview(cardImageView)
+        cardImageView.addSubview(cardLabel)
         setupConstraints()
     }
     
@@ -36,30 +41,32 @@ class MainCell: UICollectionViewCell {
     
     
     private func setupConstraints(){
-        card.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
-        card.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
-        card.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0).isActive = true
-        card.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
+        cardContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        cardContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        cardContainerView.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
+        cardContainerView.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
         
-        cardImage.topAnchor.constraint(equalTo: card.topAnchor, constant: 0).isActive = true
-        cardImage.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: 0).isActive = true
-        cardImage.centerXAnchor.constraint(equalTo: card.centerXAnchor, constant: 0).isActive = true
-        cardImage.widthAnchor.constraint(equalTo: card.widthAnchor, multiplier: 1).isActive = true
+        cardImageView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
+        cardImageView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
+        cardImageView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
+        cardImageView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
         
-        cardLabel.bottomAnchor.constraint(equalTo: cardImage.bottomAnchor, constant: -15).isActive = true
-        cardLabel.leftAnchor.constraint(equalTo: cardImage.leftAnchor, constant: 15).isActive = true
-        cardLabel.rightAnchor.constraint(equalTo: cardImage.rightAnchor, constant: -15).isActive = true
+        cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: -15).isActive = true
+        cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: 15).isActive = true
+        cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: -15).isActive = true
     }
 
     
     func setup(name: String, image: String) {
-        cardImage.image = UIImage(named: image)
+        cardImageView.image = UIImage(named: image)
         cardLabel.text = name
     }
 }
 
 extension MainCell: ScaleTransformView {
     var scaleOptions: ScaleTransformViewOptions {
-        .layout(.linear)
+        ScaleTransformViewOptions(
+            minScale: 0.55, maxScale: 0.85, scaleRatio: 0.6, translationRatio: CGPoint(x: 0.73, y: 0.2), maxTranslationRatio: CGPoint(x: 2, y: 0), keepVerticalSpacingEqual: false, keepHorizontalSpacingEqual: false, scaleCurve: .linear, translationCurve: .linear
+        )
     }
 }

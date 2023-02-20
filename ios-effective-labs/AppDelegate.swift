@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  ios-effective-labs
-//
-//  Created by test on 16.02.2023.
-//
-
 import UIKit
 
 @main

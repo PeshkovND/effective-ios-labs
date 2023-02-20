@@ -1,13 +1,6 @@
-//
-//  Triangle.swift
-//  ios-effective-labs
-//
-//  Created by test on 18.02.2023.
-//
-
 import UIKit
 
-class Triangle: UIView {
+final class Triangle: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
