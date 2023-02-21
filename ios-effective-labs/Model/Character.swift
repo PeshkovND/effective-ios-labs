@@ -1,6 +1,6 @@
 import Foundation
 
 struct Character {
-    var name: String
-    var photo: String
+    let name: String
+    let photo: String
 }

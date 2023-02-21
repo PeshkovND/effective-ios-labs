@@ -3,6 +3,10 @@ import CollectionViewPagingLayout
 
 final class MainCell: UICollectionViewCell {
     
+    private enum Layout: Double {
+        case cardLabelConstraintValue = 15
+    }
+    
     var cardContainerView: UIView = {
         let cardContainerView = UIView()
         cardContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -51,9 +55,9 @@ final class MainCell: UICollectionViewCell {
         cardImageView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
         cardImageView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
         
-        cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: -15).isActive = true
-        cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: 15).isActive = true
-        cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: -15).isActive = true
+        cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: -Layout.cardLabelConstraintValue.rawValue).isActive = true
+        cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: Layout.cardLabelConstraintValue.rawValue).isActive = true
+        cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: -Layout.cardLabelConstraintValue.rawValue).isActive = true
     }
 
     

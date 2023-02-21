@@ -15,7 +15,7 @@
 		52E3C6E6299FCE0C00D7C18F /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E3C6E5299FCE0C00D7C18F /* MainCell.swift */; };
 		52E5079329A0C11D0076F85E /* Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079229A0C11D0076F85E /* Character.swift */; };
 		52E5079529A0C1740076F85E /* CharactersMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079429A0C1740076F85E /* CharactersMocks.swift */; };
-		52E5079729A11B080076F85E /* Triangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079629A11B080076F85E /* Triangle.swift */; };
+		52E5079729A11B080076F85E /* TriangleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E5079629A11B080076F85E /* TriangleView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,7 +28,7 @@
 		52E3C6E5299FCE0C00D7C18F /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
 		52E5079229A0C11D0076F85E /* Character.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Character.swift; sourceTree = "<group>"; };
 		52E5079429A0C1740076F85E /* CharactersMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersMocks.swift; sourceTree = "<group>"; };
-		52E5079629A11B080076F85E /* Triangle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Triangle.swift; sourceTree = "<group>"; };
+		52E5079629A11B080076F85E /* TriangleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriangleView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +69,7 @@
 				52B564F4299E1C1700295B7F /* Info.plist */,
 				52B564FE299F7D6A00295B7F /* ViewController.swift */,
 				52E3C6E5299FCE0C00D7C18F /* MainCell.swift */,
-				52E5079629A11B080076F85E /* Triangle.swift */,
+				52E5079629A11B080076F85E /* TriangleView.swift */,
 			);
 			path = "ios-effective-labs";
 			sourceTree = "<group>";
@@ -163,7 +163,7 @@
 				52E5079329A0C11D0076F85E /* Character.swift in Sources */,
 				52E3C6E6299FCE0C00D7C18F /* MainCell.swift in Sources */,
 				52B564E9299E1C1600295B7F /* SceneDelegate.swift in Sources */,
-				52E5079729A11B080076F85E /* Triangle.swift in Sources */,
+				52E5079729A11B080076F85E /* TriangleView.swift in Sources */,
 				52E5079529A0C1740076F85E /* CharactersMocks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
