@@ -1,15 +1,18 @@
 import UIKit
 import CollectionViewPagingLayout
 
+
 final class ViewController: UIViewController {
     
-    private enum Layout: Double {
-        case logoWidthMultiplier = 0.5
-        case logoPngHeigh = 303
-        case logoPngWidth = 1024
-        case mainLabelTopConstraintValue = 10
-        case collectionViewTopConstraintValue = 30
-        case collectionViewBottomConstraintValue = -30
+    
+    
+    private enum Layout {
+        static let logoWidthMultiplier = CGFloat(0.5)
+        static let logoPngHeigh = CGFloat(303)
+        static let logoPngWidth = CGFloat(1024)
+        static let mainLabelTopConstraintValue = CGFloat(8)
+        static let collectionViewTopConstraintValue = CGFloat(24)
+        static let collectionViewBottomConstraintValue = CGFloat(-24)
     }
     
     private let collectionView: UICollectionView = {
@@ -27,17 +30,21 @@ final class ViewController: UIViewController {
     
     private let colors: [UIColor] = [.yellow, .blue, .purple, .red, .orange, .green]
     
-    private var triangle: TriangleView!
+    private let triangleView: TriangleView = {
+        let triangleView = TriangleView()
+        triangleView.translatesAutoresizingMaskIntoConstraints = false
+        return triangleView
+    }()
     
     
-    let logoImageView: UIImageView = {
+    private let logoImageView: UIImageView = {
         let logoView = UIImageView()
         logoView.translatesAutoresizingMaskIntoConstraints = false
         logoView.image = UIImage(named: "marvelLogo")
         return logoView
     }()
     
-    let mainLabel: UILabel = {
+    private let mainLabel: UILabel = {
         let mainLabel = UILabel()
         mainLabel.translatesAutoresizingMaskIntoConstraints = false
         mainLabel.font = UIFont.boldSystemFont(ofSize: 24)
@@ -49,42 +56,40 @@ final class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        triangleView.backgroundColor = colors[0]
         collectionView.dataSource = self
         collectionView.delegate = self
         setupLayout()
     }
     
-    func findCenterIndex() -> IndexPath? {
+    private func findCenterIndex() -> IndexPath? {
         let center = self.view.convert(self.collectionView.center, to: self.collectionView)
         let index = collectionView.indexPathForItem(at: center)
         return index
     }
 
-    func setupLayout() {
+    private func setupLayout() {
+        view.addSubview(triangleView)
+        triangleView.addSubview(logoImageView)
+        triangleView.addSubview(mainLabel)
+        triangleView.addSubview(collectionView)
         
-        triangle = TriangleView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height))
-        triangle.backgroundColor = colors[0]
-        view.addSubview(triangle)
-        triangle.addSubview(logoImageView)
-        triangle.addSubview(mainLabel)
-        triangle.addSubview(collectionView)
-        
-//        triangle.topAnchor.constraint(equalTo: view.topAnchor)
-//        triangle.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-//        triangle.leftAnchor.constraint(equalTo: view.leftAnchor)
-//        triangle.rightAnchor.constraint(equalTo: view.rightAnchor)
+        triangleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        triangleView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        triangleView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        triangleView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
         logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
-        logoImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: Layout.logoWidthMultiplier.rawValue).isActive = true
-        logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor, multiplier: Layout.logoPngHeigh.rawValue/Layout.logoPngWidth.rawValue).isActive = true
+        logoImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: Layout.logoWidthMultiplier).isActive = true
+        logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor, multiplier: Layout.logoPngHeigh/Layout.logoPngWidth).isActive = true
         
-        mainLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: Layout.mainLabelTopConstraintValue.rawValue).isActive = true
+        mainLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: Layout.mainLabelTopConstraintValue).isActive = true
         mainLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
         mainLabel.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
-        collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue.rawValue).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue.rawValue).isActive = true
+        collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue).isActive = true
         collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
         collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
     }
@@ -95,7 +100,8 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData.characters[indexPath.item]
-        cell.setup(name: character.name, image: character.photo)
+        let model = MainCell.Model(name: character.characterName, image: character.characterImage)
+        cell.setup(model)
         return cell
     }
     
@@ -107,6 +113,6 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         guard scrollView == collectionView else { return }
         let index = findCenterIndex()
         guard let index = index else { return }
-        triangle.backgroundColor = colors[index.item]
+        triangleView.backgroundColor = colors[index.item]
     }
 }

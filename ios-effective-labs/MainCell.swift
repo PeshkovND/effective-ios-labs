@@ -3,11 +3,18 @@ import CollectionViewPagingLayout
 
 final class MainCell: UICollectionViewCell {
     
-    private enum Layout: Double {
-        case cardLabelConstraintValue = 15
+    struct Model {
+        let name: String
+        let image: UIImage?
     }
     
-    var cardContainerView: UIView = {
+    private enum Layout {
+        static let cardLabelLeftConstraintValue = CGFloat(16)
+        static let cardLabelBottomConstraintValue = CGFloat(-16)
+        static let cardLabelRightConstraintValue = CGFloat(-16)
+    }
+    
+    private let cardContainerView: UIView = {
         let cardContainerView = UIView()
         cardContainerView.translatesAutoresizingMaskIntoConstraints = false
         cardContainerView.layer.cornerRadius = 30
@@ -15,14 +22,14 @@ final class MainCell: UICollectionViewCell {
         return cardContainerView
     }()
     
-    var cardImageView: UIImageView = {
+    private let cardImageView: UIImageView = {
         let cardImageView = UIImageView()
         cardImageView.translatesAutoresizingMaskIntoConstraints = false
         cardImageView.contentMode = .scaleAspectFill
         return cardImageView
     }()
     
-    var cardLabel: UILabel = {
+    private let cardLabel: UILabel = {
         let cardLabel = UILabel()
         cardLabel.translatesAutoresizingMaskIntoConstraints = false
         cardLabel.textColor = .white
@@ -55,15 +62,15 @@ final class MainCell: UICollectionViewCell {
         cardImageView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
         cardImageView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
         
-        cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: -Layout.cardLabelConstraintValue.rawValue).isActive = true
-        cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: Layout.cardLabelConstraintValue.rawValue).isActive = true
-        cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: -Layout.cardLabelConstraintValue.rawValue).isActive = true
+        cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: Layout.cardLabelBottomConstraintValue).isActive = true
+        cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: Layout.cardLabelLeftConstraintValue).isActive = true
+        cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: Layout.cardLabelRightConstraintValue).isActive = true
     }
 
     
-    func setup(name: String, image: String) {
-        cardImageView.image = UIImage(named: image)
-        cardLabel.text = name
+    func setup(_ model: Model) {
+        cardImageView.image = model.image
+        cardLabel.text = model.name
     }
 }
 

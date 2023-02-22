@@ -11,7 +11,8 @@ final class TriangleView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-
+        super.draw(rect)
+        
         guard let context = UIGraphicsGetCurrentContext() else { return }
 
         context.beginPath()
