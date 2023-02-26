@@ -115,4 +115,12 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         guard let index = index else { return }
         triangleView.backgroundColor = colors[index.item]
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let character = charactersData.characters[indexPath.item]
+        let vc = DetailsViewController()
+        let model = DetailsViewController.Model(name: character.characterName, image: character.characterImage, description: character.characterDescription)
+        vc.setupData(model)
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
