@@ -77,7 +77,15 @@ final class MainCell: UICollectionViewCell {
 extension MainCell: ScaleTransformView {
     var scaleOptions: ScaleTransformViewOptions {
         ScaleTransformViewOptions(
-            minScale: 0.55, maxScale: 0.85, scaleRatio: 0.6, translationRatio: CGPoint(x: 0.73, y: 0.2), maxTranslationRatio: CGPoint(x: 2, y: 0), keepVerticalSpacingEqual: false, keepHorizontalSpacingEqual: false, scaleCurve: .linear, translationCurve: .linear
+            minScale: 0.55,
+            maxScale: 0.85,
+            scaleRatio: 0.6,
+            translationRatio: CGPoint(x: 0.73, y: 0.2),
+            maxTranslationRatio: CGPoint(x: 2, y: 0),
+            keepVerticalSpacingEqual: false,
+            keepHorizontalSpacingEqual: false,
+            scaleCurve: .linear,
+            translationCurve: .linear
         )
     }
 }

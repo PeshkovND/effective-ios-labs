@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DetailsViewController: UIViewController {
+final class DetailsViewController: UIViewController {
     
     struct Model {
         let name: String
@@ -17,16 +17,18 @@ class DetailsViewController: UIViewController {
 
     private enum Layout {
         static let detailsLabelLeftConstraintValue = CGFloat(32)
-        static let detailsLabelTopConstraintValue = CGFloat(120)
         static let detailsLabelRightConstraintValue = CGFloat(-32)
-        static let detailsDescriptionTextViewTopConstraintValue = CGFloat(16)
+        static let detailsDescriptionTextViewLeftConstraintValue = CGFloat(32)
+        static let detailsDescriptionTextViewRightConstraintValue = CGFloat(-32)
         static let detailsDescriptionTextViewBottomConstraintValue = CGFloat(-16)
+        static let detailsDescriptionTextViewHeightConstraintMultiplier = CGFloat(0.4)
     }
     
     private let detailsImageView: UIImageView = {
         let detailsImageView = UIImageView()
         detailsImageView.translatesAutoresizingMaskIntoConstraints = false
         detailsImageView.contentMode = .scaleAspectFill
+        detailsImageView.isUserInteractionEnabled = true
         return detailsImageView
     }()
     
@@ -53,6 +55,7 @@ class DetailsViewController: UIViewController {
         detailsDescription.backgroundColor = .none
         detailsDescription.isScrollEnabled = true
         detailsDescription.isUserInteractionEnabled = true
+        detailsDescription.isEditable = false
         
         return detailsDescription
     }()
@@ -69,14 +72,14 @@ class DetailsViewController: UIViewController {
         detailsImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         detailsImageView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
-        detailsLabel.topAnchor.constraint(equalTo: detailsImageView.topAnchor, constant: Layout.detailsLabelTopConstraintValue).isActive = true
+        detailsDescriptionTextView.bottomAnchor.constraint(equalTo: detailsImageView.bottomAnchor, constant: Layout.detailsDescriptionTextViewBottomConstraintValue).isActive = true
+        detailsDescriptionTextView.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsDescriptionTextViewLeftConstraintValue).isActive = true
+        detailsDescriptionTextView.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsDescriptionTextViewRightConstraintValue).isActive = true
+        detailsDescriptionTextView.heightAnchor.constraint(equalTo: detailsImageView.heightAnchor, multiplier: Layout.detailsDescriptionTextViewHeightConstraintMultiplier).isActive = true
+        
         detailsLabel.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsLabelLeftConstraintValue).isActive = true
         detailsLabel.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsLabelRightConstraintValue).isActive = true
-        
-        detailsDescriptionTextView.bottomAnchor.constraint(equalTo: detailsImageView.bottomAnchor, constant: Layout.detailsDescriptionTextViewBottomConstraintValue).isActive = true
-        detailsDescriptionTextView.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsLabelLeftConstraintValue).isActive = true
-        detailsDescriptionTextView.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsLabelRightConstraintValue).isActive = true
-        detailsDescriptionTextView.topAnchor.constraint(equalTo: detailsLabel.bottomAnchor, constant: Layout.detailsDescriptionTextViewTopConstraintValue).isActive = true
+        detailsLabel.bottomAnchor.constraint(equalTo: detailsDescriptionTextView.topAnchor).isActive = true
         
     }
 

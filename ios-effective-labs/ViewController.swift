@@ -100,7 +100,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData.characters[indexPath.item]
-        let model = MainCell.Model(name: character.characterName, image: character.characterImage)
+        let model = MainCell.Model(name: character.name, image: character.image)
         cell.setup(model)
         return cell
     }
@@ -119,7 +119,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let character = charactersData.characters[indexPath.item]
         let vc = DetailsViewController()
-        let model = DetailsViewController.Model(name: character.characterName, image: character.characterImage, description: character.characterDescription)
+        let model = DetailsViewController.Model(name: character.name, image: character.image, description: character.description)
         vc.setupData(model)
         navigationController?.pushViewController(vc, animated: true)
     }
