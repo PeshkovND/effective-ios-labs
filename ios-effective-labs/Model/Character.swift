@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 
 struct Character {
-    let characterName: String
-    let characterImage: UIImage?
+    let name: String
+    let image: UIImage?
+    let description: String
 }
