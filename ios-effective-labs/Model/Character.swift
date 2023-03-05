@@ -1,8 +1,7 @@
 import Foundation
-import UIKit
 
 struct Character {
     let name: String
-    let image: UIImage?
+    let imageUrl: URL?
     let description: String
 }

@@ -22,6 +22,8 @@ final class ViewController: UIViewController {
         collectionView.backgroundColor = .none
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
+        collectionView.clipsToBounds = false
+        collectionView.isUserInteractionEnabled = true
         collectionView.register(MainCell.self, forCellWithReuseIdentifier: String(describing: MainCell.self))
         return collectionView
     }()
@@ -90,8 +92,8 @@ final class ViewController: UIViewController {
         
         collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 50).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -50).isActive = true
     }
 }
 
@@ -100,7 +102,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData.characters[indexPath.item]
-        let model = MainCell.Model(name: character.name, image: character.image)
+        let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl)
         cell.setup(model)
         return cell
     }
@@ -119,7 +121,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let character = charactersData.characters[indexPath.item]
         let vc = DetailsViewController()
-        let model = DetailsViewController.Model(name: character.name, image: character.image, description: character.description)
+        let model = DetailsViewController.Model(name: character.name, imageUrl: character.imageUrl, description: character.description)
         vc.setupData(model)
         navigationController?.pushViewController(vc, animated: true)
     }

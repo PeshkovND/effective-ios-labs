@@ -11,7 +11,7 @@ final class DetailsViewController: UIViewController {
     
     struct Model {
         let name: String
-        let image: UIImage?
+        let imageUrl: URL?
         let description: String
     }
 
@@ -84,7 +84,7 @@ final class DetailsViewController: UIViewController {
     }
 
     func setupData(_ model: Model) {
-        detailsImageView.image = model.image
+        detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
         detailsDescriptionTextView.text = model.description
     }
