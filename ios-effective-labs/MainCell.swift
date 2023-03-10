@@ -5,7 +5,7 @@ final class MainCell: UICollectionViewCell {
     
     struct Model {
         let name: String
-        let image: UIImage?
+        let imageUrl: URL?
     }
     
     private enum Layout {
@@ -19,6 +19,7 @@ final class MainCell: UICollectionViewCell {
         cardContainerView.translatesAutoresizingMaskIntoConstraints = false
         cardContainerView.layer.cornerRadius = 30
         cardContainerView.clipsToBounds = true
+        cardContainerView.backgroundColor = .gray
         return cardContainerView
     }()
     
@@ -40,10 +41,7 @@ final class MainCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(cardContainerView)
-        cardContainerView.addSubview(cardImageView)
-        cardImageView.addSubview(cardLabel)
-        setupConstraints()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -51,11 +49,15 @@ final class MainCell: UICollectionViewCell {
     }
     
     
-    private func setupConstraints(){
+    private func setupLayout(){
+        contentView.addSubview(cardContainerView)
+        cardContainerView.addSubview(cardImageView)
+        cardImageView.addSubview(cardLabel)
+        
+        cardContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
+        cardContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         cardContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         cardContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        cardContainerView.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
-        cardContainerView.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
         
         cardImageView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
         cardImageView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
@@ -65,25 +67,25 @@ final class MainCell: UICollectionViewCell {
         cardLabel.bottomAnchor.constraint(equalTo: cardImageView.bottomAnchor, constant: Layout.cardLabelBottomConstraintValue).isActive = true
         cardLabel.leftAnchor.constraint(equalTo: cardImageView.leftAnchor, constant: Layout.cardLabelLeftConstraintValue).isActive = true
         cardLabel.rightAnchor.constraint(equalTo: cardImageView.rightAnchor, constant: Layout.cardLabelRightConstraintValue).isActive = true
+        
     }
 
     
     func setup(_ model: Model) {
-        cardImageView.image = model.image
-        cardLabel.text = model.name
+        self.cardImageView.setImageUrl(url: model.imageUrl)
+        self.cardLabel.text = model.name
     }
 }
 
 extension MainCell: ScaleTransformView {
     var scaleOptions: ScaleTransformViewOptions {
         ScaleTransformViewOptions(
-            minScale: 0.55,
-            maxScale: 0.85,
-            scaleRatio: 0.6,
-            translationRatio: CGPoint(x: 0.73, y: 0.2),
+            minScale: 0.6,
+            scaleRatio: 0.4,
+            translationRatio: CGPoint(x: 0.66, y: 0.2),
             maxTranslationRatio: CGPoint(x: 2, y: 0),
-            keepVerticalSpacingEqual: false,
-            keepHorizontalSpacingEqual: false,
+            keepVerticalSpacingEqual: true,
+            keepHorizontalSpacingEqual: true,
             scaleCurve: .linear,
             translationCurve: .linear
         )

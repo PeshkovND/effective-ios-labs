@@ -11,7 +11,7 @@ final class DetailsViewController: UIViewController {
     
     struct Model {
         let name: String
-        let image: UIImage?
+        let imageUrl: URL?
         let description: String
     }
 
@@ -29,6 +29,7 @@ final class DetailsViewController: UIViewController {
         detailsImageView.translatesAutoresizingMaskIntoConstraints = false
         detailsImageView.contentMode = .scaleAspectFill
         detailsImageView.isUserInteractionEnabled = true
+        detailsImageView.backgroundColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1)
         return detailsImageView
     }()
     
@@ -84,7 +85,7 @@ final class DetailsViewController: UIViewController {
     }
 
     func setupData(_ model: Model) {
-        detailsImageView.image = model.image
+        detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
         detailsDescriptionTextView.text = model.description
     }
