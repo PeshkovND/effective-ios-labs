@@ -8,6 +8,15 @@ extension UIImageView {
         self.kf.setImage(with: url,
                          options: [
                         .cacheOriginalImage,
-                        ])
+                        ],
+                         completionHandler: {result in
+                            switch result {
+                            case .success(let value):
+                                self.image = value.image
+                            case .failure(let error):
+                                self.image = UIImage(named: "error")
+                                print(error)
+                            }
+                        })
     }
 }

@@ -12,18 +12,17 @@ final class ViewController: UIViewController {
         static let logoPngWidth = CGFloat(1024)
         static let mainLabelTopConstraintValue = CGFloat(8)
         static let collectionViewTopConstraintValue = CGFloat(24)
-        static let collectionViewBottomConstraintValue = CGFloat(-24)
+        static let collectionViewBottomConstraintValue = CGFloat(24)
     }
     
     private let collectionView: UICollectionView = {
         let layout = CollectionViewPagingLayout()
+        layout.numberOfVisibleItems = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .none
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
-        collectionView.clipsToBounds = false
-        collectionView.isUserInteractionEnabled = true
         collectionView.register(MainCell.self, forCellWithReuseIdentifier: String(describing: MainCell.self))
         return collectionView
     }()
@@ -91,9 +90,9 @@ final class ViewController: UIViewController {
         mainLabel.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
         collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 50).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -50).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Layout.collectionViewBottomConstraintValue).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
 }
 

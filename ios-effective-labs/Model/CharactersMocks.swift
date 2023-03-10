@@ -20,7 +20,7 @@ final class CharactersMocks {
         
         let ch5 = Character(name: "Rocket", imageUrl: URL(string: "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/3/30/Rocket_Vol._3.jpg"), description: "Subject 89P13 is a creature who was genetically enhanced by the High Evolutionary. Dubbed Rocket Raccoon, he traveled the galaxy with his friend Groot, committing crimes and picking up bounties until they met Star-Lord, who convinced them to assist him in selling the Orb, which was being sought after by Ronan the Accuser, for a massive profit.")
         
-        let ch6 = Character(name: "Hulk", imageUrl: URL(string: "https://static.wikia.nocookie.net/marvelcinematicuniverse/images/7/79/Hulk_in_the_She-Hulk_series_-_Infobox.jpg"), description: "Doctor Robert Bruce Banner, M.D., Ph.D., is a renowned scientist and a founding member of the Avengers. Highly respected for his work in biochemistry, nuclear physics and gamma radiation, Banner was tasked by Thaddeus Ross to recreate the Super Soldier Serum that created Captain America.")
+        let ch6 = Character(name: "Hulk", imageUrl: URL(string: "https://satic.wikia.nocookie.net/marvelcinematicuniverse/images/7/79/Hulk_in_the_She-Hulk_series_-_Infobox.jpg"), description: "Doctor Robert Bruce Banner, M.D., Ph.D., is a renowned scientist and a founding member of the Avengers. Highly respected for his work in biochemistry, nuclear physics and gamma radiation, Banner was tasked by Thaddeus Ross to recreate the Super Soldier Serum that created Captain America.")
         
         self.characters = [ch1, ch2, ch3, ch4, ch5, ch6]
     }

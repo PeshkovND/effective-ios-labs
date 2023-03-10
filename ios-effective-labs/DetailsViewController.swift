@@ -29,6 +29,7 @@ final class DetailsViewController: UIViewController {
         detailsImageView.translatesAutoresizingMaskIntoConstraints = false
         detailsImageView.contentMode = .scaleAspectFill
         detailsImageView.isUserInteractionEnabled = true
+        detailsImageView.backgroundColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1)
         return detailsImageView
     }()
     

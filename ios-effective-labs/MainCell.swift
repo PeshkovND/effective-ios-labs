@@ -19,7 +19,7 @@ final class MainCell: UICollectionViewCell {
         cardContainerView.translatesAutoresizingMaskIntoConstraints = false
         cardContainerView.layer.cornerRadius = 30
         cardContainerView.clipsToBounds = true
-        cardContainerView.backgroundColor = .white
+        cardContainerView.backgroundColor = .gray
         return cardContainerView
     }()
     
@@ -54,10 +54,10 @@ final class MainCell: UICollectionViewCell {
         cardContainerView.addSubview(cardImageView)
         cardImageView.addSubview(cardLabel)
         
+        cardContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
+        cardContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         cardContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         cardContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        cardContainerView.leftAnchor.constraint(equalTo: contentView.leftAnchor).isActive = true
-        cardContainerView.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
         
         cardImageView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
         cardImageView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
@@ -72,8 +72,8 @@ final class MainCell: UICollectionViewCell {
 
     
     func setup(_ model: Model) {
-            self.cardImageView.setImageUrl(url: model.imageUrl)
-            self.cardLabel.text = model.name
+        self.cardImageView.setImageUrl(url: model.imageUrl)
+        self.cardLabel.text = model.name
     }
 }
 
@@ -90,9 +90,4 @@ extension MainCell: ScaleTransformView {
             translationCurve: .linear
         )
     }
-    
-    func transform(progress: CGFloat) {
-        applyScaleTransform(progress: progress)
-    }
-    
 }
