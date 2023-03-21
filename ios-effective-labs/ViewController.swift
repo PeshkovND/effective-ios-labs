@@ -12,11 +12,12 @@ final class ViewController: UIViewController {
         static let logoPngWidth = CGFloat(1024)
         static let mainLabelTopConstraintValue = CGFloat(8)
         static let collectionViewTopConstraintValue = CGFloat(24)
-        static let collectionViewBottomConstraintValue = CGFloat(-24)
+        static let collectionViewBottomConstraintValue = CGFloat(24)
     }
     
     private let collectionView: UICollectionView = {
         let layout = CollectionViewPagingLayout()
+        layout.numberOfVisibleItems = 3
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .none
@@ -89,9 +90,9 @@ final class ViewController: UIViewController {
         mainLabel.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
         collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue).isActive = true
-        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
-        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Layout.collectionViewBottomConstraintValue).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
 }
 
@@ -100,7 +101,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData.characters[indexPath.item]
-        let model = MainCell.Model(name: character.name, image: character.image)
+        let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl)
         cell.setup(model)
         return cell
     }
@@ -119,7 +120,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let character = charactersData.characters[indexPath.item]
         let vc = DetailsViewController()
-        let model = DetailsViewController.Model(name: character.name, image: character.image, description: character.description)
+        let model = DetailsViewController.Model(name: character.name, imageUrl: character.imageUrl, description: character.description)
         vc.setupData(model)
         navigationController?.pushViewController(vc, animated: true)
     }

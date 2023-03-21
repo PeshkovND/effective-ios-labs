@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		525689AD29B496E2004AD4BA /* UIImageViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 525689AC29B496E2004AD4BA /* UIImageViewExtensions.swift */; };
 		52B564E7299E1C1600295B7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B564E6299E1C1600295B7F /* AppDelegate.swift */; };
 		52B564E9299E1C1600295B7F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B564E8299E1C1600295B7F /* SceneDelegate.swift */; };
 		52B564F0299E1C1700295B7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52B564EF299E1C1700295B7F /* Assets.xcassets */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		525689AC29B496E2004AD4BA /* UIImageViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageViewExtensions.swift; sourceTree = "<group>"; };
 		52B564E3299E1C1600295B7F /* ios-effective-labs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-effective-labs.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		52B564E6299E1C1600295B7F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52B564E8299E1C1600295B7F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -47,6 +49,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		525689AB29B496C2004AD4BA /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				525689AC29B496E2004AD4BA /* UIImageViewExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		52B564DA299E1C1600295B7F = {
 			isa = PBXGroup;
 			children = (
@@ -66,6 +76,7 @@
 		52B564E5299E1C1600295B7F /* ios-effective-labs */ = {
 			isa = PBXGroup;
 			children = (
+				525689AB29B496C2004AD4BA /* Extensions */,
 				52E5079129A0C1010076F85E /* Model */,
 				52B564E6299E1C1600295B7F /* AppDelegate.swift */,
 				52B564E8299E1C1600295B7F /* SceneDelegate.swift */,
@@ -169,6 +180,7 @@
 				52B564FF299F7D6A00295B7F /* ViewController.swift in Sources */,
 				52E5079329A0C11D0076F85E /* Character.swift in Sources */,
 				52C943AE29AB7BDB0032B417 /* DetailsViewController.swift in Sources */,
+				525689AD29B496E2004AD4BA /* UIImageViewExtensions.swift in Sources */,
 				52E3C6E6299FCE0C00D7C18F /* MainCell.swift in Sources */,
 				52B564E9299E1C1600295B7F /* SceneDelegate.swift in Sources */,
 				52E5079729A11B080076F85E /* TriangleView.swift in Sources */,
