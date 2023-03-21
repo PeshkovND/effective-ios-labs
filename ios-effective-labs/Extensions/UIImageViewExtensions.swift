@@ -9,7 +9,7 @@ extension UIImageView {
                          options: [
                         .cacheOriginalImage,
                         ],
-                         completionHandler: {result in
+                         completionHandler: { result in
                             switch result {
                             case .success(let value):
                                 self.image = value.image

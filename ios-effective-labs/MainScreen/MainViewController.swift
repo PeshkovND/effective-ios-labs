@@ -1,10 +1,11 @@
 import UIKit
 import CollectionViewPagingLayout
+import Alamofire
 
 
-final class ViewController: UIViewController {
+final class MainViewController: UIViewController {
     
-    
+    private let viewModel = MainViewModel()
     
     private enum Layout {
         static let logoWidthMultiplier = CGFloat(0.5)
@@ -12,12 +13,11 @@ final class ViewController: UIViewController {
         static let logoPngWidth = CGFloat(1024)
         static let mainLabelTopConstraintValue = CGFloat(8)
         static let collectionViewTopConstraintValue = CGFloat(24)
-        static let collectionViewBottomConstraintValue = CGFloat(24)
+        static let collectionViewBottomConstraintValue = CGFloat(-24)
     }
     
-    private let collectionView: UICollectionView = {
-        let layout = CollectionViewPagingLayout()
-        layout.numberOfVisibleItems = 3
+    private let layout = CollectionViewPagingLayout()
+    private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .none
@@ -27,7 +27,7 @@ final class ViewController: UIViewController {
         return collectionView
     }()
     
-    private let charactersData = CharactersMocks()
+    private var charactersData: [MainViewModel.Model] = []
     
     private let colors: [UIColor] = [.yellow, .blue, .purple, .red, .orange, .green]
     
@@ -37,6 +37,19 @@ final class ViewController: UIViewController {
         return triangleView
     }()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .medium)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .black
+        activityIndicator.startAnimating()
+        return activityIndicator
+    }()
+    
+    private let loadingView: LoadingView = {
+        let loadingView = LoadingView()
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        return loadingView
+    }()
     
     private let logoImageView: UIImageView = {
         let logoView = UIImageView()
@@ -60,9 +73,16 @@ final class ViewController: UIViewController {
         triangleView.backgroundColor = colors[0]
         collectionView.dataSource = self
         collectionView.delegate = self
+        loadingView.start()
+        viewModel.fetchData(completition: {[weak self] items in
+            self?.charactersData = items
+            self?.collectionView.reloadData()
+            self?.layout.setCurrentPage(0)
+            self?.loadingView.stop()
+        })
         setupLayout()
     }
-    
+
     private func findCenterIndex() -> IndexPath? {
         let center = self.view.convert(self.collectionView.center, to: self.collectionView)
         let index = collectionView.indexPathForItem(at: center)
@@ -74,6 +94,7 @@ final class ViewController: UIViewController {
         triangleView.addSubview(logoImageView)
         triangleView.addSubview(mainLabel)
         triangleView.addSubview(collectionView)
+        view.addSubview(loadingView)
         
         triangleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         triangleView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -90,24 +111,30 @@ final class ViewController: UIViewController {
         mainLabel.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
         collectionView.topAnchor.constraint(equalTo: mainLabel.bottomAnchor, constant: Layout.collectionViewTopConstraintValue).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Layout.collectionViewBottomConstraintValue).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: Layout.collectionViewBottomConstraintValue).isActive = true
         collectionView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         collectionView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        
+        loadingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loadingView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        loadingView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        
     }
 }
 
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
-        let character = charactersData.characters[indexPath.item]
+        let character = charactersData[indexPath.item]
         let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl)
         cell.setup(model)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        charactersData.characters.count
+        charactersData.count
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -118,10 +145,9 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let character = charactersData.characters[indexPath.item]
+        let character = charactersData[indexPath.item]
         let vc = DetailsViewController()
-        let model = DetailsViewController.Model(name: character.name, imageUrl: character.imageUrl, description: character.description)
-        vc.setupData(model)
+        vc.fetchCharacterData(id: character.id)
         navigationController?.pushViewController(vc, animated: true)
     }
 }
