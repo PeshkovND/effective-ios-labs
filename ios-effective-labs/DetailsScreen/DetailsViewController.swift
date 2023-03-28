@@ -4,6 +4,7 @@ import Alamofire
 final class DetailsViewController: UIViewController {
     
     let viewModel = DetailsViewModel()
+    private var id: Int? = nil
     
     private enum Layout {
         static let detailsLabelLeftConstraintValue = CGFloat(32)
@@ -25,6 +26,7 @@ final class DetailsViewController: UIViewController {
     private let loadingView: LoadingView = {
         let loadingView = LoadingView()
         loadingView.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.reloadButton.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
         return loadingView
     }()
     
@@ -55,6 +57,12 @@ final class DetailsViewController: UIViewController {
         
         return detailsDescription
     }()
+    
+    @objc private func didButtonClick(_ sender: UIButton) {
+        loadingView.start()
+        guard let id = self.id else { return }
+        fetchCharacterData(id: id)
+    }
     
     private func setupLayout() {
         view.addSubview(detailsImageView)
@@ -100,10 +108,15 @@ final class DetailsViewController: UIViewController {
         loadingView.start()
     }
     
-    func fetchCharacterData(id: Int) {  
-        viewModel.fetchOneCharacter(id: id, completition: {[weak self] item in
-            self?.setupData(item)
-            self?.loadingView.stop()
-        })
+    func fetchCharacterData(id: Int) {
+        self.id = id
+        viewModel.fetchOneCharacter(id: id,
+                                    completition: {[weak self] item in
+                                        self?.setupData(item)
+                                        self?.loadingView.stop()
+                                    },
+                                    failure: {[weak self] in
+                                        self?.loadingView.showError()
+                                    })
     }
 }

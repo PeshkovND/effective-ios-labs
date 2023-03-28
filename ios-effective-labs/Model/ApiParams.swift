@@ -6,4 +6,5 @@ struct ApiParams: Encodable {
     let apikey: String
     let hash: String
     let limit: String
+    let offset: String
 }

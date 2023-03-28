@@ -11,8 +11,8 @@ final class MainViewModel {
 
     var data: [Model]? = nil
     
-    func fetchData(completition: @escaping (([Model])-> Void)){
-        let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "10")
+    func fetchData(offset: Int, completition: @escaping (([Model], Int)-> Void), failure: @escaping (()-> Void)){
+        let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "10", offset: String(offset))
         
         AF.request("https://gateway.marvel.com/v1/public/characters", parameters: login).responseDecodable(of: ApiResponce.self) { response in
             switch response.result {
@@ -22,10 +22,32 @@ final class MainViewModel {
                         Model(id: elem.id, imageUrl: URL(string: "\(elem.thumbnail.path).\(elem.thumbnail.ext)"), name: elem.name)
                     }
                     guard let data = self.data else { return }
-                    completition(data)
+                    let count = response.data.total
+                    completition(data, count)
                 }
-            case .failure(let error):
-                print(error)
+            case .failure(_):
+                failure()
+            }
+        }
+        
+    }
+    
+    func brokenFetchData(offset: Int, completition: @escaping (([Model], Int)-> Void), failure: @escaping (()-> Void)){
+        let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "10", offset: String(offset))
+        
+        AF.request("https://gateway.marvel.com/v1/public/characte", parameters: login).responseDecodable(of: ApiResponce.self) { response in
+            switch response.result {
+            case .success(_):
+                if let response = response.value {
+                    self.data = response.data.results.map { (elem) -> Model in
+                        Model(id: elem.id, imageUrl: URL(string: "\(elem.thumbnail.path).\(elem.thumbnail.ext)"), name: elem.name)
+                    }
+                    guard let data = self.data else { return }
+                    let count = response.data.total
+                    completition(data, count)
+                }
+            case .failure(_):
+                failure()
             }
         }
         

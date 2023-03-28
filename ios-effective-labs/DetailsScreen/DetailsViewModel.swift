@@ -11,9 +11,9 @@ final class DetailsViewModel {
 
     var data: Model? = nil
 
-    func fetchOneCharacter(id: Int, completition: @escaping ((Model)-> Void)){
+    func fetchOneCharacter(id: Int, completition: @escaping ((Model) -> Void), failure: @escaping (() -> Void)){
 
-        let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "1")
+        let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "1", offset: "0")
         AF.request("https://gateway.marvel.com/v1/public/characters/\(id)", parameters: login).responseDecodable(of: ApiResponce.self) { response in
             switch response.result {
             case .success(_):
@@ -23,8 +23,8 @@ final class DetailsViewModel {
                     guard let data = self.data else { return }
                     completition(data)
                 }
-            case .failure(let error):
-                print(error)
+            case .failure(_):
+                failure()
             }
         }
     }

@@ -5,6 +5,9 @@ import Alamofire
 
 final class MainViewController: UIViewController {
     
+    private var offset = 10
+    private var allDataCount = 0
+
     private let viewModel = MainViewModel()
     
     private enum Layout {
@@ -24,10 +27,14 @@ final class MainViewController: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
         collectionView.register(MainCell.self, forCellWithReuseIdentifier: String(describing: MainCell.self))
+        collectionView.register(LoadingCell.self, forCellWithReuseIdentifier: String(describing: LoadingCell.self))
         return collectionView
     }()
     
     private var charactersData: [MainViewModel.Model] = []
+    private var localDataCount: Int {
+        return charactersData.count
+    }
     
     private let triangleView: TriangleView = {
         let triangleView = TriangleView()
@@ -36,17 +43,58 @@ final class MainViewController: UIViewController {
         return triangleView
     }()
     
-    private let activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .medium)
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.color = .black
-        activityIndicator.startAnimating()
-        return activityIndicator
-    }()
+    private func fetchData() {
+        viewModel.fetchData(
+            offset: 0,
+            completition: {[weak self] items, count in
+                self?.charactersData = items
+                self?.collectionView.reloadData()
+                self?.layout.setCurrentPage(0)
+                self?.loadingView.stop()
+                self?.allDataCount = count
+            },
+            failure: {[weak self] in
+                self?.loadingView.showError()
+            })
+    }
+    
+    private func fetchPagData() {
+        viewModel.fetchData(
+            offset: self.offset,
+            completition: {[weak self] items, count in
+                guard let characterData = self?.charactersData else { return }
+                self?.charactersData = characterData + items
+                self?.collectionView.reloadData()
+                self?.collectionView.performBatchUpdates({
+                    self?.collectionView.collectionViewLayout.invalidateLayout()
+                })
+                self?.offset += 10},
+            failure: {[weak self] in
+                guard let collectionView = self?.collectionView else { return }
+                guard let charactersDataCount = self?.localDataCount else { return }
+                let cell = collectionView.cellForItem(at: IndexPath(row: charactersDataCount, section: 0))
+                guard let cell = cell as? LoadingCell else { return }
+                cell.showError()
+            })
+    }
+    
+    @objc private func didButtonClick(_ sender: UIButton) {
+        loadingView.start()
+        fetchData()
+    }
+    
+    @objc private func didCellButtonClick(sender: UIButton) {
+        let cell = collectionView.cellForItem(at: IndexPath(row: localDataCount, section: 0))
+        guard let cell = cell as? LoadingCell else { return }
+        cell.showError()
+        cell.start()
+        fetchPagData()
+    }
     
     private let loadingView: LoadingView = {
         let loadingView = LoadingView()
         loadingView.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.reloadButton.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
         return loadingView
     }()
     
@@ -72,12 +120,7 @@ final class MainViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         loadingView.start()
-        viewModel.fetchData(completition: {[weak self] items in
-            self?.charactersData = items
-            self?.collectionView.reloadData()
-            self?.layout.setCurrentPage(0)
-            self?.loadingView.stop()
-        })
+        fetchData()
         setupLayout()
     }
 
@@ -123,6 +166,12 @@ final class MainViewController: UIViewController {
 
 extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if indexPath.item == localDataCount {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: LoadingCell.self), for: indexPath)
+            guard let cell = cell as? LoadingCell else { return cell }
+            cell.reloadButton.addTarget(self, action: #selector(didCellButtonClick), for: .touchUpInside)
+            return cell
+        }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData[indexPath.item]
@@ -132,19 +181,23 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        charactersData.count
+        localDataCount == 0 || localDataCount == allDataCount ? localDataCount : localDataCount + 1
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard scrollView == collectionView else { return }
         let index = findCenterIndex()
         guard let index = index else { return }
+        if index.item == self.localDataCount && localDataCount < self.allDataCount {
+            fetchPagData()
+        }
         let cell = collectionView.cellForItem(at: index)
         guard let cell = cell as? MainCell else { return }
         triangleView.backgroundColor = cell.dominantColor
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard indexPath.item < localDataCount else { return }
         let character = charactersData[indexPath.item]
         let vc = DetailsViewController()
         vc.fetchCharacterData(id: character.id)
