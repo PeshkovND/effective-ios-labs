@@ -29,10 +29,9 @@ final class MainViewController: UIViewController {
     
     private var charactersData: [MainViewModel.Model] = []
     
-    private let colors: [UIColor] = [.yellow, .blue, .purple, .red, .orange, .green]
-    
     private let triangleView: TriangleView = {
         let triangleView = TriangleView()
+        triangleView.backgroundColor = .red
         triangleView.translatesAutoresizingMaskIntoConstraints = false
         return triangleView
     }()
@@ -70,7 +69,6 @@ final class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        triangleView.backgroundColor = colors[0]
         collectionView.dataSource = self
         collectionView.delegate = self
         loadingView.start()
@@ -141,7 +139,9 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
         guard scrollView == collectionView else { return }
         let index = findCenterIndex()
         guard let index = index else { return }
-        triangleView.backgroundColor = colors[index.item]
+        let cell = collectionView.cellForItem(at: index)
+        guard let cell = cell as? MainCell else { return }
+        triangleView.backgroundColor = cell.dominantColor
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
