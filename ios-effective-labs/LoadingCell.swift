@@ -72,6 +72,10 @@ final class LoadingCell: UICollectionViewCell {
         activityIndicator.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
     }
     
+//    func setup() {
+//        reloadButton.addAction(UIAction(handler: <#T##UIActionHandler##UIActionHandler##(UIAction) -> Void#>), for: .)
+//    }
+//    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
@@ -95,6 +99,10 @@ final class LoadingCell: UICollectionViewCell {
         activityIndicator.centerXAnchor.constraint(equalTo: cardContainerView.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
     }
+//    
+//    @objc private func onRetryTapped() {
+//        model?.onRetryTapped()
+//    }
 }
 
 extension LoadingCell: ScaleTransformView {

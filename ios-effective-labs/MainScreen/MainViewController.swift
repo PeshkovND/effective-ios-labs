@@ -72,8 +72,7 @@ final class MainViewController: UIViewController {
                 },
             failure: {[weak self] in
                 guard let collectionView = self?.collectionView else { return }
-                guard let charactersDataCount = self?.localDataCount else { return }
-                let cell = collectionView.cellForItem(at: IndexPath(row: charactersDataCount, section: 0))
+                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: SectionItem(index: 1).rawValue))
                 guard let cell = cell as? LoadingCell else { return }
                 cell.showError()
             })
@@ -165,40 +164,69 @@ final class MainViewController: UIViewController {
     }
 }
 
+enum SectionItem: Int, CaseIterable {
+    case item
+    case loading
+    
+    init(index: Int) {
+        switch index {
+        case 0:
+            self = .item
+        case 1:
+            self = .loading
+        default:
+            assertionFailure("Unexpected index: \(index)")
+            self = .item
+        }
+    }
+}
+
 extension MainViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        SectionItem.allCases.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.item == localDataCount {
+        switch SectionItem(index: indexPath.section) {
+        case .item:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
+            guard let cell = cell as? MainCell else { return cell }
+            let character = charactersData[indexPath.item]
+            if indexPath.item == offset {
+                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
+                    self?.triangleView.backgroundColor = image.averageColor
+                })
+                cell.setup(model)
+            }
+            else {
+                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
+                cell.setup(model)
+            }
+            return cell
+        case .loading:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: LoadingCell.self), for: indexPath)
             guard let cell = cell as? LoadingCell else { return cell }
+            cell.start()
             cell.reloadButton.addTarget(self, action: #selector(didCellButtonClick), for: .touchUpInside)
             return cell
         }
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
-        guard let cell = cell as? MainCell else { return cell }
-        let character = charactersData[indexPath.item]
-        if indexPath.item == offset {
-            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
-                self?.triangleView.backgroundColor = image.averageColor
-            })
-            cell.setup(model)
-        }
-        else {
-            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
-            cell.setup(model)
-        }
-        
-        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        localDataCount == 0 || localDataCount == allDataCount ? localDataCount : localDataCount + 1
+        switch SectionItem(index: section) {
+        case .item:
+            return localDataCount
+        case .loading:
+            return localDataCount == 0 || localDataCount == allDataCount ? 0 : 1
+        }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         guard scrollView == collectionView else { return }
         let index = findCenterIndex()
         guard let index = index else { return }
-        if index.item == self.localDataCount && localDataCount < self.allDataCount {
+        if SectionItem(index: index.section) == .loading {
             fetchPagData()
         }
         let cell = collectionView.cellForItem(at: index)
