@@ -72,7 +72,8 @@ final class MainViewController: UIViewController {
                 },
             failure: {[weak self] in
                 guard let collectionView = self?.collectionView else { return }
-                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: SectionItem(index: 1).rawValue))
+                let loadingCellType: SectionItem = .loading
+                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
                 guard let cell = cell as? LoadingCell else { return }
                 cell.showError()
             })
@@ -84,9 +85,9 @@ final class MainViewController: UIViewController {
     }
     
     @objc private func didCellButtonClick(sender: UIButton) {
-        let cell = collectionView.cellForItem(at: IndexPath(row: localDataCount, section: 0))
+        let loadingCellType: SectionItem = .loading
+        let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
         guard let cell = cell as? LoadingCell else { return }
-        cell.showError()
         cell.start()
         fetchPagData()
     }
@@ -229,13 +230,15 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
         if SectionItem(index: index.section) == .loading {
             fetchPagData()
         }
-        let cell = collectionView.cellForItem(at: index)
-        guard let cell = cell as? MainCell else { return }
-        triangleView.backgroundColor = cell.dominantColor
+        else {
+            let cell = collectionView.cellForItem(at: index)
+            guard let cell = cell as? MainCell else { return }
+            triangleView.backgroundColor = cell.dominantColor
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard indexPath.item < localDataCount else { return }
+        guard SectionItem(index: indexPath.section) == .item else { return }
         let character = charactersData[indexPath.item]
         let vc = DetailsViewController()
         vc.fetchCharacterData(id: character.id)

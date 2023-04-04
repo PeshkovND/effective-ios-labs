@@ -18,11 +18,22 @@ final class LoadingCell: UICollectionViewCell {
         return cardContainerView
     }()
     
+    private let cardContainerLoadingView: UIView = {
+        let cardContainerView = UIView()
+        cardContainerView.translatesAutoresizingMaskIntoConstraints = false
+        return cardContainerView
+    }()
+    
+    private let cardContainerErrorView: UIView = {
+        let cardContainerView = UIView()
+        cardContainerView.translatesAutoresizingMaskIntoConstraints = false
+        return cardContainerView
+    }()
+    
     private let activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView()
         activityIndicator.color = .red
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicator.startAnimating()
         return activityIndicator
     }()
     
@@ -45,37 +56,20 @@ final class LoadingCell: UICollectionViewCell {
     }()
     
     func showError() {
-        activityIndicator.stopAnimating()
-        activityIndicator.removeFromSuperview()
-        
-        cardContainerView.addSubview(errorLabel)
-        cardContainerView.addSubview(reloadButton)
-        
-        errorLabel.centerXAnchor.constraint(equalTo: cardContainerView.centerXAnchor).isActive = true
-        errorLabel.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
-        errorLabel.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
-        errorLabel.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
-        
-        reloadButton.centerXAnchor.constraint(equalTo: errorLabel.centerXAnchor).isActive = true
-        reloadButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor).isActive = true
-        reloadButton.widthAnchor.constraint(equalToConstant: reloadButton.intrinsicContentSize.width).isActive = true
+        UIView.animate(withDuration: 0.5) { [self] in
+            self.cardContainerLoadingView.alpha = 0
+            self.cardContainerErrorView.alpha = 1
+        }
     }
     
     func start() {
-        reloadButton.removeFromSuperview()
-        errorLabel.removeFromSuperview()
-        
-        cardContainerView.addSubview(activityIndicator)
+        UIView.animate(withDuration: 0.5) { [self] in
+            self.cardContainerLoadingView.alpha = 1
+            self.cardContainerErrorView.alpha = 0
+        }
         activityIndicator.startAnimating()
-        
-        activityIndicator.centerXAnchor.constraint(equalTo: cardContainerView.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
     }
     
-//    func setup() {
-//        reloadButton.addAction(UIAction(handler: <#T##UIActionHandler##UIActionHandler##(UIAction) -> Void#>), for: .)
-//    }
-//    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupLayout()
@@ -85,24 +79,43 @@ final class LoadingCell: UICollectionViewCell {
         super.init(coder: coder)
     }
     
-    
     private func setupLayout(){
         contentView.addSubview(cardContainerView)
-        cardContainerView.addSubview(activityIndicator)
-        activityIndicator.startAnimating()
+        cardContainerView.addSubview(cardContainerErrorView)
+        cardContainerView.addSubview(cardContainerLoadingView)
+        
+        cardContainerErrorView.addSubview(errorLabel)
+        cardContainerErrorView.addSubview(reloadButton)
+        
+        cardContainerLoadingView.addSubview(activityIndicator)
         
         cardContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
         cardContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         cardContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         cardContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
-        activityIndicator.centerXAnchor.constraint(equalTo: cardContainerView.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
+        cardContainerLoadingView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
+        cardContainerLoadingView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
+        cardContainerLoadingView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
+        cardContainerLoadingView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
+        
+        cardContainerErrorView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
+        cardContainerErrorView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
+        cardContainerErrorView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
+        cardContainerErrorView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
+        
+        activityIndicator.centerXAnchor.constraint(equalTo: cardContainerLoadingView.centerXAnchor).isActive = true
+        activityIndicator.centerYAnchor.constraint(equalTo: cardContainerLoadingView.centerYAnchor).isActive = true
+        
+        errorLabel.centerXAnchor.constraint(equalTo: cardContainerErrorView.centerXAnchor).isActive = true
+        errorLabel.centerYAnchor.constraint(equalTo: cardContainerErrorView.centerYAnchor).isActive = true
+        errorLabel.leftAnchor.constraint(equalTo: cardContainerErrorView.leftAnchor).isActive = true
+        errorLabel.rightAnchor.constraint(equalTo: cardContainerErrorView.rightAnchor).isActive = true
+        
+        reloadButton.centerXAnchor.constraint(equalTo: errorLabel.centerXAnchor).isActive = true
+        reloadButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor).isActive = true
+        reloadButton.widthAnchor.constraint(equalToConstant: reloadButton.intrinsicContentSize.width).isActive = true
     }
-//    
-//    @objc private func onRetryTapped() {
-//        model?.onRetryTapped()
-//    }
 }
 
 extension LoadingCell: ScaleTransformView {
