@@ -5,7 +5,7 @@ import Alamofire
 
 final class MainViewController: UIViewController {
     
-    private var offset = 10
+    private var offset = 0
     private var allDataCount = 0
 
     private let viewModel = MainViewModel()
@@ -60,15 +60,16 @@ final class MainViewController: UIViewController {
     
     private func fetchPagData() {
         viewModel.fetchData(
-            offset: self.offset,
+            offset: self.offset + 10,
             completition: {[weak self] items, count in
                 guard let characterData = self?.charactersData else { return }
+                self?.offset += 10
                 self?.charactersData = characterData + items
                 self?.collectionView.reloadData()
                 self?.collectionView.performBatchUpdates({
                     self?.collectionView.collectionViewLayout.invalidateLayout()
                 })
-                self?.offset += 10},
+                },
             failure: {[weak self] in
                 guard let collectionView = self?.collectionView else { return }
                 guard let charactersDataCount = self?.localDataCount else { return }
@@ -175,8 +176,17 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
         guard let cell = cell as? MainCell else { return cell }
         let character = charactersData[indexPath.item]
-        let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl)
-        cell.setup(model)
+        if indexPath.item == offset {
+            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
+                self?.triangleView.backgroundColor = image.averageColor
+            })
+            cell.setup(model)
+        }
+        else {
+            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
+            cell.setup(model)
+        }
+        
         return cell
     }
     

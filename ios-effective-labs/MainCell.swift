@@ -10,6 +10,7 @@ final class MainCell: UICollectionViewCell {
     struct Model {
         let name: String
         let imageUrl: URL?
+        let downloadImageComplition: ((UIImage) -> Void)?
     }
     
     private enum Layout {
@@ -74,9 +75,8 @@ final class MainCell: UICollectionViewCell {
         
     }
 
-    
     func setup(_ model: Model) {
-        self.cardImageView.setImageUrl(url: model.imageUrl)
+        self.cardImageView.setImageUrl(url: model.imageUrl, complition: model.downloadImageComplition)
         self.cardLabel.text = model.name
     }
 }

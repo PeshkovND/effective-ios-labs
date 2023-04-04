@@ -64,9 +64,9 @@ final class LoadingCell: UICollectionViewCell {
     func start() {
         reloadButton.removeFromSuperview()
         errorLabel.removeFromSuperview()
-        activityIndicator.startAnimating()
         
         cardContainerView.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
         
         activityIndicator.centerXAnchor.constraint(equalTo: cardContainerView.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor).isActive = true
@@ -85,6 +85,7 @@ final class LoadingCell: UICollectionViewCell {
     private func setupLayout(){
         contentView.addSubview(cardContainerView)
         cardContainerView.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
         
         cardContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
         cardContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true

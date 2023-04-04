@@ -3,7 +3,7 @@ import UIKit
 import Kingfisher
 
 extension UIImageView {
-    func setImageUrl(url: URL?) {
+    func setImageUrl(url: URL?, complition: ((UIImage) -> Void)? = nil) {
         self.kf.indicatorType = .activity
         self.kf.setImage(with: url,
                          options: [
@@ -13,6 +13,7 @@ extension UIImageView {
                             switch result {
                             case .success(let value):
                                 self.image = value.image
+                                complition?(value.image)
                             case .failure(let error):
                                 self.image = UIImage(named: "error")
                                 print(error)
