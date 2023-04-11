@@ -7,6 +7,7 @@ final class MainViewController: UIViewController {
     
     private var offset = 0
     private var allDataCount = 0
+    private let db = DBManager()
 
     private let viewModel = MainViewModel()
     
@@ -46,12 +47,17 @@ final class MainViewController: UIViewController {
     private func fetchData() {
         viewModel.fetchData(
             offset: 0,
-            completition: {[weak self] items, count in
+            completition: {[weak self] items, count, isConnectionOk in
                 self?.charactersData = items
                 self?.collectionView.reloadData()
                 self?.layout.setCurrentPage(0)
                 self?.loadingView.stop()
                 self?.allDataCount = count
+                if (!isConnectionOk) {
+                    UIView.animate(withDuration: 0.5) { [self] in
+                        self?.connectionErrorLabel.alpha = 1
+                    }
+                }
             },
             failure: {[weak self] in
                 self?.loadingView.showError()
@@ -61,7 +67,7 @@ final class MainViewController: UIViewController {
     private func fetchPagData() {
         viewModel.fetchData(
             offset: self.offset + 10,
-            completition: {[weak self] items, count in
+            completition: {[weak self] items, count, _ in
                 guard let characterData = self?.charactersData else { return }
                 self?.offset += 10
                 self?.charactersData = characterData + items
@@ -97,6 +103,16 @@ final class MainViewController: UIViewController {
         loadingView.translatesAutoresizingMaskIntoConstraints = false
         loadingView.reloadButton.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
         return loadingView
+    }()
+    
+    private let connectionErrorLabel: UILabel = {
+        let connectionErrorMessage = UILabel()
+        connectionErrorMessage.text = "Offline Mode! Showing cached data"
+        connectionErrorMessage.textColor = .red
+        connectionErrorMessage.translatesAutoresizingMaskIntoConstraints = false
+        connectionErrorMessage.textAlignment = .center
+        connectionErrorMessage.alpha = 0
+        return connectionErrorMessage
     }()
     
     private let logoImageView: UIImageView = {
@@ -137,13 +153,18 @@ final class MainViewController: UIViewController {
         triangleView.addSubview(mainLabel)
         triangleView.addSubview(collectionView)
         view.addSubview(loadingView)
+        view.addSubview(connectionErrorLabel)
         
         triangleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         triangleView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         triangleView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         triangleView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
-        logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        connectionErrorLabel.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        
+        logoImageView.topAnchor.constraint(equalTo: connectionErrorLabel.bottomAnchor).isActive = true
         logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
         logoImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: Layout.logoWidthMultiplier).isActive = true
         logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor, multiplier: Layout.logoPngHeigh/Layout.logoPngWidth).isActive = true
