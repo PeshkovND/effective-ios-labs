@@ -1,20 +1,11 @@
-//
-//  DetailsViewController.swift
-//  ios-effective-labs
-//
-//  Created by test on 26.02.2023.
-//
-
 import UIKit
+import Alamofire
 
 final class DetailsViewController: UIViewController {
     
-    struct Model {
-        let name: String
-        let imageUrl: URL?
-        let description: String
-    }
-
+    let viewModel = DetailsViewModel()
+    private var id: Int? = nil
+    
     private enum Layout {
         static let detailsLabelLeftConstraintValue = CGFloat(32)
         static let detailsLabelRightConstraintValue = CGFloat(-32)
@@ -29,8 +20,14 @@ final class DetailsViewController: UIViewController {
         detailsImageView.translatesAutoresizingMaskIntoConstraints = false
         detailsImageView.contentMode = .scaleAspectFill
         detailsImageView.isUserInteractionEnabled = true
-        detailsImageView.backgroundColor = UIColor(red: 0.3, green: 0.3, blue: 0.3, alpha: 1)
         return detailsImageView
+    }()
+    
+    private let loadingView: LoadingView = {
+        let loadingView = LoadingView()
+        loadingView.translatesAutoresizingMaskIntoConstraints = false
+        loadingView.reloadButton.addTarget(self, action: #selector(didButtonClick), for: .touchUpInside)
+        return loadingView
     }()
     
     private let backBarButtonItem: UIBarButtonItem = {
@@ -61,12 +58,18 @@ final class DetailsViewController: UIViewController {
         return detailsDescription
     }()
     
+    @objc private func didButtonClick(_ sender: UIButton) {
+        loadingView.start()
+        guard let id = self.id else { return }
+        fetchCharacterData(id: id)
+    }
+    
     private func setupLayout() {
-        
         view.addSubview(detailsImageView)
         view.clipsToBounds = true
         detailsImageView.addSubview(detailsLabel)
         detailsImageView.addSubview(detailsDescriptionTextView)
+        view.addSubview(loadingView)
         
         detailsImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         detailsImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -82,9 +85,13 @@ final class DetailsViewController: UIViewController {
         detailsLabel.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsLabelRightConstraintValue).isActive = true
         detailsLabel.bottomAnchor.constraint(equalTo: detailsDescriptionTextView.topAnchor).isActive = true
         
+        loadingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        loadingView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        loadingView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
 
-    func setupData(_ model: Model) {
+    private func setupData(_ model: DetailsViewModel.Model) {
         detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
         detailsDescriptionTextView.text = model.description
@@ -94,5 +101,22 @@ final class DetailsViewController: UIViewController {
         super.viewDidLoad()
         navigationController?.navigationBar.topItem?.backBarButtonItem = backBarButtonItem
         setupLayout()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadingView.start()
+    }
+    
+    func fetchCharacterData(id: Int) {
+        self.id = id
+        viewModel.fetchOneCharacter(id: id,
+                                    completition: {[weak self] item in
+                                        self?.setupData(item)
+                                        self?.loadingView.stop()
+                                    },
+                                    failure: {[weak self] in
+                                        self?.loadingView.showError()
+                                    })
     }
 }
