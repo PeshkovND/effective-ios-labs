@@ -20,7 +20,7 @@ final class MainViewModel {
                 if let response = response.value {
                     let result = response.data.results.map { (elem) -> Model in
                         let url = "\(elem.thumbnail.path).\(elem.thumbnail.ext)"
-                        self.db.save(id: elem.id, name: elem.name, imageUrl: url)
+                        self.db.saveToAllCharactersCollection(id: elem.id, name: elem.name, imageUrl: url)
                         return Model(id: elem.id, imageUrl: URL(string: url), name: elem.name)
                     }
                     let count = response.data.total

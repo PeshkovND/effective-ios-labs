@@ -54,9 +54,7 @@ final class MainViewController: UIViewController {
                 self?.loadingView.stop()
                 self?.allDataCount = count
                 if (!isConnectionOk) {
-                    UIView.animate(withDuration: 0.5) { [self] in
-                        self?.connectionErrorLabel.alpha = 1
-                    }
+                    self?.connectionErrorLabel.show()
                 }
             },
             failure: {[weak self] in
@@ -105,21 +103,17 @@ final class MainViewController: UIViewController {
         return loadingView
     }()
     
-    private let connectionErrorLabel: UILabel = {
-        let connectionErrorMessage = UILabel()
-        connectionErrorMessage.text = "Offline Mode! Showing cached data"
-        connectionErrorMessage.textColor = .red
-        connectionErrorMessage.translatesAutoresizingMaskIntoConstraints = false
-        connectionErrorMessage.textAlignment = .center
-        connectionErrorMessage.alpha = 0
-        return connectionErrorMessage
-    }()
-    
     private let logoImageView: UIImageView = {
         let logoView = UIImageView()
         logoView.translatesAutoresizingMaskIntoConstraints = false
         logoView.image = UIImage(named: "marvelLogo")
         return logoView
+    }()
+    
+    private let connectionErrorLabel: ConnectionErrorLabel = {
+        let connectionErrorLabel = ConnectionErrorLabel()
+        connectionErrorLabel.translatesAutoresizingMaskIntoConstraints = false
+        return connectionErrorLabel
     }()
     
     private let mainLabel: UILabel = {
