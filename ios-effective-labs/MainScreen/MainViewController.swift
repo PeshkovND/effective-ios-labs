@@ -7,6 +7,7 @@ final class MainViewController: UIViewController {
     
     private var offset = 0
     private var allDataCount = 0
+    private let db = DBManager()
 
     private let viewModel = MainViewModel()
     
@@ -43,15 +44,29 @@ final class MainViewController: UIViewController {
         return triangleView
     }()
     
+    private let refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didRefresh), for: .valueChanged)
+        refreshControl.tintColor = .red
+        return refreshControl
+    }()
+    
     private func fetchData() {
         viewModel.fetchData(
             offset: 0,
-            completition: {[weak self] items, count in
+            completition: {[weak self] items, count, isConnectionOk in
                 self?.charactersData = items
                 self?.collectionView.reloadData()
+                self?.collectionView.performBatchUpdates({
+                    self?.collectionView.collectionViewLayout.invalidateLayout()
+                })
                 self?.layout.setCurrentPage(0)
                 self?.loadingView.stop()
+                self?.refreshControl.endRefreshing()
                 self?.allDataCount = count
+                if (!isConnectionOk) {
+                    self?.connectionErrorLabel.show()
+                }
             },
             failure: {[weak self] in
                 self?.loadingView.showError()
@@ -61,7 +76,7 @@ final class MainViewController: UIViewController {
     private func fetchPagData() {
         viewModel.fetchData(
             offset: self.offset + 10,
-            completition: {[weak self] items, count in
+            completition: {[weak self] items, count, _ in
                 guard let characterData = self?.charactersData else { return }
                 self?.offset += 10
                 self?.charactersData = characterData + items
@@ -77,6 +92,12 @@ final class MainViewController: UIViewController {
                 guard let cell = cell as? LoadingCell else { return }
                 cell.showError()
             })
+    }
+    
+    @objc private func didRefresh(_ sender: UIRefreshControl) {
+        loadingView.start()
+        connectionErrorLabel.hide()
+        fetchData()
     }
     
     @objc private func didButtonClick(_ sender: UIButton) {
@@ -104,6 +125,12 @@ final class MainViewController: UIViewController {
         logoView.translatesAutoresizingMaskIntoConstraints = false
         logoView.image = UIImage(named: "marvelLogo")
         return logoView
+    }()
+    
+    private let connectionErrorLabel: ConnectionErrorLabel = {
+        let connectionErrorLabel = ConnectionErrorLabel()
+        connectionErrorLabel.translatesAutoresizingMaskIntoConstraints = false
+        return connectionErrorLabel
     }()
     
     private let mainLabel: UILabel = {
@@ -137,13 +164,19 @@ final class MainViewController: UIViewController {
         triangleView.addSubview(mainLabel)
         triangleView.addSubview(collectionView)
         view.addSubview(loadingView)
+        view.addSubview(connectionErrorLabel)
+        triangleView.refreshControl = refreshControl
         
         triangleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         triangleView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         triangleView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         triangleView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
-        logoImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        connectionErrorLabel.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        
+        logoImageView.topAnchor.constraint(equalTo: connectionErrorLabel.bottomAnchor).isActive = true
         logoImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
         logoImageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: Layout.logoWidthMultiplier).isActive = true
         logoImageView.heightAnchor.constraint(equalTo: logoImageView.widthAnchor, multiplier: Layout.logoPngHeigh/Layout.logoPngWidth).isActive = true

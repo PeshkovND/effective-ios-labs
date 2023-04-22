@@ -23,6 +23,12 @@ final class DetailsViewController: UIViewController {
         return detailsImageView
     }()
     
+    private let connectionErrorLabel: ConnectionErrorLabel = {
+        let connectionErrorLabel = ConnectionErrorLabel()
+        connectionErrorLabel.translatesAutoresizingMaskIntoConstraints = false
+        return connectionErrorLabel
+    }()
+    
     private let loadingView: LoadingView = {
         let loadingView = LoadingView()
         loadingView.translatesAutoresizingMaskIntoConstraints = false
@@ -70,6 +76,11 @@ final class DetailsViewController: UIViewController {
         detailsImageView.addSubview(detailsLabel)
         detailsImageView.addSubview(detailsDescriptionTextView)
         view.addSubview(loadingView)
+        view.addSubview(connectionErrorLabel)
+        
+        connectionErrorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        connectionErrorLabel.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
         detailsImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         detailsImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -111,12 +122,15 @@ final class DetailsViewController: UIViewController {
     func fetchCharacterData(id: Int) {
         self.id = id
         viewModel.fetchOneCharacter(id: id,
-                                    completition: {[weak self] item in
-                                        self?.setupData(item)
-                                        self?.loadingView.stop()
+            completition: {[weak self] item, isConnectionOk in
+                self?.setupData(item)
+                self?.loadingView.stop()
+                if !isConnectionOk {
+                    self?.connectionErrorLabel.show()
+                }
                                     },
-                                    failure: {[weak self] in
-                                        self?.loadingView.showError()
-                                    })
+        failure: {[weak self] in
+            self?.loadingView.showError()
+         })
     }
 }

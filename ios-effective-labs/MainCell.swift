@@ -3,9 +3,9 @@ import CollectionViewPagingLayout
 
 final class MainCell: UICollectionViewCell {
     
-    public lazy var dominantColor: UIColor? = {
+    public var dominantColor: UIColor? {
         return cardImageView.image?.averageColor
-    }()
+    }
     
     struct Model {
         let name: String
