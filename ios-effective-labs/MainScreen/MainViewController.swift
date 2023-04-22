@@ -2,14 +2,34 @@ import UIKit
 import CollectionViewPagingLayout
 import Alamofire
 
+enum MainViewState {
+    case loading
+    case loaded(data:[MainViewCharacter], allDataCount: Int, localDataCount: Int)
+    case updating
+    case updated(data:[MainViewCharacter], allDataCount: Int, localDataCount: Int)
+    case updatingError
+    case error
+    case offline(data:[MainViewCharacter], allDataCount: Int, localDataCount: Int)
+}
+
+struct MainViewCharacter: Hashable {
+    let id: Int
+    let imageUrl: URL?
+    let name: String
+}
 
 final class MainViewController: UIViewController {
     
-    private var offset = 0
-    private var allDataCount = 0
-    private let db = DBManager()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    init(viewModel: MainViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
 
-    private let viewModel = MainViewModel()
+    private let viewModel: MainViewModel
     
     private enum Layout {
         static let logoWidthMultiplier = CGFloat(0.5)
@@ -32,10 +52,9 @@ final class MainViewController: UIViewController {
         return collectionView
     }()
     
-    private var charactersData: [MainViewModel.Model] = []
-    private var localDataCount: Int {
-        return charactersData.count
-    }
+    private var charactersData: [MainViewCharacter] = []
+    private var allDataCount: Int?
+    private var localDataCount: Int?
     
     private let triangleView: TriangleView = {
         let triangleView = TriangleView()
@@ -51,66 +70,59 @@ final class MainViewController: UIViewController {
         return refreshControl
     }()
     
-    private func fetchData() {
-        viewModel.fetchData(
-            offset: 0,
-            completition: {[weak self] items, count, isConnectionOk in
-                self?.charactersData = items
-                self?.collectionView.reloadData()
-                self?.collectionView.performBatchUpdates({
-                    self?.collectionView.collectionViewLayout.invalidateLayout()
-                })
-                self?.layout.setCurrentPage(0)
-                self?.loadingView.stop()
-                self?.refreshControl.endRefreshing()
-                self?.allDataCount = count
-                if (!isConnectionOk) {
-                    self?.connectionErrorLabel.show()
-                }
-            },
-            failure: {[weak self] in
-                self?.loadingView.showError()
-            })
-    }
+//    private func fetchData() {
+//        viewModel.fetchData(
+//            offset: 0,
+//            completition: {[weak self] items, count, isConnectionOk in
+//                self?.charactersData = items
+//                self?.collectionView.reloadData()
+//                self?.collectionView.performBatchUpdates({
+//                    self?.collectionView.collectionViewLayout.invalidateLayout()
+//                })
+//                self?.layout.setCurrentPage(0)
+//                self?.loadingView.stop()
+//                self?.refreshControl.endRefreshing()
+//                self?.allDataCount = count
+//                if (!isConnectionOk) {
+//                    self?.connectionErrorLabel.show()
+//                }
+//            },
+//            failure: {[weak self] in
+//                self?.loadingView.showError()
+//            })
+//    }
     
-    private func fetchPagData() {
-        viewModel.fetchData(
-            offset: self.offset + 10,
-            completition: {[weak self] items, count, _ in
-                guard let characterData = self?.charactersData else { return }
-                self?.offset += 10
-                self?.charactersData = characterData + items
-                self?.collectionView.reloadData()
-                self?.collectionView.performBatchUpdates({
-                    self?.collectionView.collectionViewLayout.invalidateLayout()
-                })
-                },
-            failure: {[weak self] in
-                guard let collectionView = self?.collectionView else { return }
-                let loadingCellType: SectionItem = .loading
-                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
-                guard let cell = cell as? LoadingCell else { return }
-                cell.showError()
-            })
-    }
+//    private func fetchPagData() {
+//        viewModel.fetchData(
+//            offset: self.offset + 10,
+//            completition: {[weak self] items, count, _ in
+//                guard let characterData = self?.charactersData else { return }
+//                self?.offset += 10
+//                self?.charactersData = characterData + items
+//                self?.collectionView.reloadData()
+//                self?.collectionView.performBatchUpdates({
+//                    self?.collectionView.collectionViewLayout.invalidateLayout()
+//                })
+//                },
+//            failure: {[weak self] in
+//                guard let collectionView = self?.collectionView else { return }
+//                let loadingCellType: SectionItem = .loading
+//                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
+//                guard let cell = cell as? LoadingCell else { return }
+//                cell.showError()
+//            })
+//    }
     
     @objc private func didRefresh(_ sender: UIRefreshControl) {
-        loadingView.start()
-        connectionErrorLabel.hide()
-        fetchData()
+        viewModel.onPullToRefresh()
     }
     
     @objc private func didButtonClick(_ sender: UIButton) {
-        loadingView.start()
-        fetchData()
+        viewModel.onRetryButtonClick()
     }
     
     @objc private func didCellButtonClick(sender: UIButton) {
-        let loadingCellType: SectionItem = .loading
-        let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
-        guard let cell = cell as? LoadingCell else { return }
-        cell.start()
-        fetchPagData()
+        viewModel.onCellButtonClick()
     }
     
     private let loadingView: LoadingView = {
@@ -147,9 +159,55 @@ final class MainViewController: UIViewController {
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
-        loadingView.start()
-        fetchData()
+        viewModel.onChangeViewState = { [weak self] state in
+            switch state {
+                case .loading:
+                    self?.connectionErrorLabel.hide()
+                    self?.loadingView.start()
+                    break
+                case .loaded(let data, let allDataCount, let localDataCount):
+                    self?.setupData(data: data, allCount: allDataCount, localCount: localDataCount)
+                    self?.layout.setCurrentPage(0)
+                    break
+                case .offline(let data, let allDataCount, let localDataCount):
+                    self?.setupData(data: data, allCount: allDataCount, localCount: localDataCount)
+                    self?.layout.setCurrentPage(0)
+                    self?.connectionErrorLabel.show()
+                    break
+                case .updated(let data, let allDataCount, let localDataCount):
+                    self?.setupData(data: data, allCount: allDataCount, localCount: localDataCount)
+                    break
+                case .updating:
+                    let loadingCellType: SectionItem = .loading
+                    let cell = self?.collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
+                    guard let cell = cell as? LoadingCell else { return }
+                    cell.start()
+                case .updatingError:
+                    let loadingCellType: SectionItem = .loading
+                    let cell = self?.collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
+                    guard let cell = cell as? LoadingCell else { return }
+                    cell.showError()
+                case .error:
+                    self?.refreshControl.endRefreshing()
+                    self?.loadingView.showError()
+            }
+        }
+        
+        viewModel.start()
         setupLayout()
+    }
+    
+    private func setupData(data: [MainViewCharacter], allCount: Int, localCount: Int) {
+        self.charactersData = data
+        self.collectionView.reloadData()
+        self.allDataCount = allCount
+        self.localDataCount = localCount
+        self.collectionView.performBatchUpdates({
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        })
+        
+        self.loadingView.stop()
+        self.refreshControl.endRefreshing()
     }
 
     private func findCenterIndex() -> IndexPath? {
@@ -227,16 +285,16 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
             guard let cell = cell as? MainCell else { return cell }
             let character = charactersData[indexPath.item]
-            if indexPath.item == offset {
-                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
-                    self?.triangleView.backgroundColor = image.averageColor
-                })
-                cell.setup(model)
-            }
-            else {
+//            if indexPath.item == offset {
+//                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
+//                    self?.triangleView.backgroundColor = image.averageColor
+//                })
+//                cell.setup(model)
+//            }
+//            else {
                 let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
                 cell.setup(model)
-            }
+//            }
             return cell
         case .loading:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: LoadingCell.self), for: indexPath)
@@ -250,7 +308,8 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch SectionItem(index: section) {
         case .item:
-            return localDataCount
+            guard let count = localDataCount else { return 0 }
+            return count
         case .loading:
             return localDataCount == 0 || localDataCount == allDataCount ? 0 : 1
         }
@@ -261,7 +320,7 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
         let index = findCenterIndex()
         guard let index = index else { return }
         if SectionItem(index: index.section) == .loading {
-            fetchPagData()
+            viewModel.paggingUpdate()
         }
         else {
             let cell = collectionView.cellForItem(at: index)

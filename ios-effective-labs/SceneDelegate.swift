@@ -12,7 +12,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        let mainController = MainViewController()
+        let repository = CharactersRepositoryImpl()
+        let mainViewModel = MainViewModelImpl(repository: repository)
+        let mainController = MainViewController(viewModel: mainViewModel)
         let navigationController = UINavigationController(rootViewController: mainController)
         navigationController.navigationBar.tintColor = .white
         window?.rootViewController = navigationController

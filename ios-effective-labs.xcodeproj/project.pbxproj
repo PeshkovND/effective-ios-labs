@@ -22,6 +22,7 @@
 		5277BD9729E5615900B1669F /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 5277BD9629E5615900B1669F /* RealmSwift */; };
 		5277BD9929E5715900B1669F /* CharacterDetailsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5277BD9829E5715900B1669F /* CharacterDetailsModel.swift */; };
 		5277BD9B29E577FA00B1669F /* ConnectionErrorLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5277BD9A29E577FA00B1669F /* ConnectionErrorLabel.swift */; };
+		5277BD9E29F4046E00B1669F /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5277BD9D29F4046E00B1669F /* Repository.swift */; };
 		52B564E7299E1C1600295B7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B564E6299E1C1600295B7F /* AppDelegate.swift */; };
 		52B564E9299E1C1600295B7F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B564E8299E1C1600295B7F /* SceneDelegate.swift */; };
 		52B564F0299E1C1700295B7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 52B564EF299E1C1700295B7F /* Assets.xcassets */; };
@@ -47,6 +48,7 @@
 		5277BD8C29E5546500B1669F /* DBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBManager.swift; sourceTree = "<group>"; };
 		5277BD9829E5715900B1669F /* CharacterDetailsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailsModel.swift; sourceTree = "<group>"; };
 		5277BD9A29E577FA00B1669F /* ConnectionErrorLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionErrorLabel.swift; sourceTree = "<group>"; };
+		5277BD9D29F4046E00B1669F /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
 		52B564E3299E1C1600295B7F /* ios-effective-labs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-effective-labs.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		52B564E6299E1C1600295B7F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52B564E8299E1C1600295B7F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -102,6 +104,14 @@
 			path = DetailsScreen;
 			sourceTree = "<group>";
 		};
+		5277BD9C29F4044F00B1669F /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				5277BD9D29F4046E00B1669F /* Repository.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
 		52B564DA299E1C1600295B7F = {
 			isa = PBXGroup;
 			children = (
@@ -121,6 +131,7 @@
 		52B564E5299E1C1600295B7F /* ios-effective-labs */ = {
 			isa = PBXGroup;
 			children = (
+				5277BD9C29F4044F00B1669F /* Repository */,
 				525689BB29C9A220004AD4BA /* DetailsScreen */,
 				525689BA29C9A101004AD4BA /* MainScreen */,
 				525689AB29B496C2004AD4BA /* Extensions */,
@@ -240,6 +251,7 @@
 				52E5079329A0C11D0076F85E /* Character.swift in Sources */,
 				525689B929C2154E004AD4BA /* LoadingView.swift in Sources */,
 				52C943AE29AB7BDB0032B417 /* DetailsViewController.swift in Sources */,
+				5277BD9E29F4046E00B1669F /* Repository.swift in Sources */,
 				525689BD29C9A29D004AD4BA /* MainViewModel.swift in Sources */,
 				525689AD29B496E2004AD4BA /* UIImageViewExtensions.swift in Sources */,
 				5277BD8429D2F88500B1669F /* LoadingCell.swift in Sources */,
