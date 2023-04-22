@@ -44,14 +44,25 @@ final class MainViewController: UIViewController {
         return triangleView
     }()
     
+    private let refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didRefresh), for: .valueChanged)
+        refreshControl.tintColor = .red
+        return refreshControl
+    }()
+    
     private func fetchData() {
         viewModel.fetchData(
             offset: 0,
             completition: {[weak self] items, count, isConnectionOk in
                 self?.charactersData = items
                 self?.collectionView.reloadData()
+                self?.collectionView.performBatchUpdates({
+                    self?.collectionView.collectionViewLayout.invalidateLayout()
+                })
                 self?.layout.setCurrentPage(0)
                 self?.loadingView.stop()
+                self?.refreshControl.endRefreshing()
                 self?.allDataCount = count
                 if (!isConnectionOk) {
                     self?.connectionErrorLabel.show()
@@ -81,6 +92,12 @@ final class MainViewController: UIViewController {
                 guard let cell = cell as? LoadingCell else { return }
                 cell.showError()
             })
+    }
+    
+    @objc private func didRefresh(_ sender: UIRefreshControl) {
+        loadingView.start()
+        connectionErrorLabel.hide()
+        fetchData()
     }
     
     @objc private func didButtonClick(_ sender: UIButton) {
@@ -148,6 +165,7 @@ final class MainViewController: UIViewController {
         triangleView.addSubview(collectionView)
         view.addSubview(loadingView)
         view.addSubview(connectionErrorLabel)
+        triangleView.refreshControl = refreshControl
         
         triangleView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         triangleView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true

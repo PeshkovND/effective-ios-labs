@@ -1,6 +1,6 @@
 import UIKit
 
-final class TriangleView: UIView {
+final class TriangleView: UIScrollView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)

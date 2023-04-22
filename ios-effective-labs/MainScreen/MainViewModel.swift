@@ -11,7 +11,7 @@ final class MainViewModel {
     
     var db = DBManager()
     
-    func fetchData(offset: Int, completition: @escaping (([Model], Int, Bool)-> Void), failure: @escaping (()-> Void)){
+    func fetchData(offset: Int, completition: @escaping (([Model], Int, Bool)-> Void), failure: @escaping (()-> Void)){ // closure parametrs
         let login = ApiParams(ts: "1", apikey: "9e1625adec3543f712c47407f1c3e422", hash: "33421d5e5ba0b96d2f20d5777a2d3a5a", limit: "10", offset: String(offset))
         
         AF.request("https://gateway.marvel.com/v1/public/characters", parameters: login).responseDecodable(of: ApiResponce.self) { response in
