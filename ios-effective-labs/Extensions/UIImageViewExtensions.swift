@@ -13,7 +13,6 @@ extension UIImageView {
                             switch result {
                             case .success(let value):
                                 self.image = value.image
-                                complition?(value.image)
                             case .failure(let error):
                                 self.image = UIImage(named: "error")
                                 print(error)

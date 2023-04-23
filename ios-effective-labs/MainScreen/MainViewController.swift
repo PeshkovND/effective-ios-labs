@@ -1,6 +1,7 @@
 import UIKit
 import CollectionViewPagingLayout
 import Alamofire
+import Kingfisher
 
 enum MainViewState {
     case loading
@@ -161,9 +162,23 @@ final class MainViewController: UIViewController {
         self.collectionView.performBatchUpdates({
             self.collectionView.collectionViewLayout.invalidateLayout()
         })
-        
         self.loadingView.stop()
         self.refreshControl.endRefreshing()
+        let character = self.charactersData[self.layout.currentPage]
+        self.changeBackgroundColor(elem: character)
+    }
+    
+    private func changeBackgroundColor(elem: MainViewCharacter) {
+        guard let imageUrl = elem.imageUrl else { return }
+        KingfisherManager.shared.retrieveImage(with: imageUrl, options: nil,  completionHandler: {
+            result in
+            switch result {
+            case .success(let result):
+                self.triangleView.backgroundColor = result.image.averageColor
+            case .failure(_):
+                self.triangleView.backgroundColor = .red
+            }
+        })
     }
 
     private func findCenterIndex() -> IndexPath? {
@@ -241,7 +256,7 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
             guard let cell = cell as? MainCell else { return cell }
             let character = charactersData[indexPath.item]
-            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
+            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl)
             cell.setup(model)
             return cell
         case .loading:
@@ -271,9 +286,8 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             viewModel.paggingUpdate()
         }
         else {
-            let cell = collectionView.cellForItem(at: index)
-            guard let cell = cell as? MainCell else { return }
-            triangleView.backgroundColor = cell.dominantColor
+            let character = charactersData[index.row]
+            changeBackgroundColor(elem: character)
         }
     }
     
