@@ -124,10 +124,12 @@ final class MainViewController: UIViewController {
                     self?.loadingView.start()
                     break
                 case .loaded(let data, let allDataCount, let localDataCount):
+                    self?.layout.setCurrentPage(0)
                     self?.setupData(data: data, allCount: allDataCount, localCount: localDataCount)
                     self?.layout.setCurrentPage(0)
                     break
                 case .offline(let data, let allDataCount, let localDataCount):
+                    self?.layout.setCurrentPage(0)
                     self?.setupData(data: data, allCount: allDataCount, localCount: localDataCount)
                     self?.layout.setCurrentPage(0)
                     self?.connectionErrorLabel.show()

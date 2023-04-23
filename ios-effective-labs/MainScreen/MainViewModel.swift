@@ -73,7 +73,6 @@ final class MainViewModelImpl: MainViewModel {
                                                     }
                                                     else {
                                                         if (offset != 0) {
-                                                            print("erorred")
                                                             self?.onChangeViewState?(.updatingError)
                                                             self?.offset -= 10
                                                         }
@@ -84,8 +83,8 @@ final class MainViewModelImpl: MainViewModel {
                                                     }
                                                     self?.offset += 10
                                                 case .failure:
-                                                    guard let offset = self?.offset else { return }
-                                                    if offset <= 10 {
+                                                    guard let heroes = self?.heroes else { return }
+                                                if heroes.count == 0 {
                                                         self?.onChangeViewState?(.error)
                                                     }
                                                 else {

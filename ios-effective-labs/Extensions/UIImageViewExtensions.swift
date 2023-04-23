@@ -13,9 +13,8 @@ extension UIImageView {
                             switch result {
                             case .success(let value):
                                 self.image = value.image
-                            case .failure(let error):
+                            case .failure(_):
                                 self.image = UIImage(named: "error")
-                                print(error)
                             }
                         })
     }
