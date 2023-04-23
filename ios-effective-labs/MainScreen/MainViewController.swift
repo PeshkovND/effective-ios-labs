@@ -69,50 +69,7 @@ final class MainViewController: UIViewController {
         refreshControl.tintColor = .red
         return refreshControl
     }()
-    
-//    private func fetchData() {
-//        viewModel.fetchData(
-//            offset: 0,
-//            completition: {[weak self] items, count, isConnectionOk in
-//                self?.charactersData = items
-//                self?.collectionView.reloadData()
-//                self?.collectionView.performBatchUpdates({
-//                    self?.collectionView.collectionViewLayout.invalidateLayout()
-//                })
-//                self?.layout.setCurrentPage(0)
-//                self?.loadingView.stop()
-//                self?.refreshControl.endRefreshing()
-//                self?.allDataCount = count
-//                if (!isConnectionOk) {
-//                    self?.connectionErrorLabel.show()
-//                }
-//            },
-//            failure: {[weak self] in
-//                self?.loadingView.showError()
-//            })
-//    }
-    
-//    private func fetchPagData() {
-//        viewModel.fetchData(
-//            offset: self.offset + 10,
-//            completition: {[weak self] items, count, _ in
-//                guard let characterData = self?.charactersData else { return }
-//                self?.offset += 10
-//                self?.charactersData = characterData + items
-//                self?.collectionView.reloadData()
-//                self?.collectionView.performBatchUpdates({
-//                    self?.collectionView.collectionViewLayout.invalidateLayout()
-//                })
-//                },
-//            failure: {[weak self] in
-//                guard let collectionView = self?.collectionView else { return }
-//                let loadingCellType: SectionItem = .loading
-//                let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: loadingCellType.rawValue))
-//                guard let cell = cell as? LoadingCell else { return }
-//                cell.showError()
-//            })
-//    }
-    
+
     @objc private func didRefresh(_ sender: UIRefreshControl) {
         viewModel.onPullToRefresh()
     }
@@ -192,7 +149,6 @@ final class MainViewController: UIViewController {
                     self?.loadingView.showError()
             }
         }
-        
         viewModel.start()
         setupLayout()
     }
@@ -285,16 +241,8 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: MainCell.self), for: indexPath)
             guard let cell = cell as? MainCell else { return cell }
             let character = charactersData[indexPath.item]
-//            if indexPath.item == offset {
-//                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: { [weak self] image in
-//                    self?.triangleView.backgroundColor = image.averageColor
-//                })
-//                cell.setup(model)
-//            }
-//            else {
-                let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
-                cell.setup(model)
-//            }
+            let model = MainCell.Model(name: character.name, imageUrl: character.imageUrl, downloadImageComplition: nil)
+            cell.setup(model)
             return cell
         case .loading:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: LoadingCell.self), for: indexPath)
@@ -332,8 +280,8 @@ extension MainViewController: UICollectionViewDataSource, UICollectionViewDelega
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard SectionItem(index: indexPath.section) == .item else { return }
         let character = charactersData[indexPath.item]
-        let vc = DetailsViewController()
-        vc.fetchCharacterData(id: character.id)
+        let viewModel = DetailsViewModelImpl(id: character.id, repository: CharactersRepositoryImpl())
+        let vc = DetailsViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

@@ -1,10 +1,31 @@
 import UIKit
 import Alamofire
 
+enum DetailsViewState {
+    case loading
+    case loaded(DetailsViewCharacter)
+    case error
+    case offline(DetailsViewCharacter)
+}
+
+struct DetailsViewCharacter: Hashable {
+    let imageUrl: URL?
+    let name: String
+    let description: String
+}
+
 final class DetailsViewController: UIViewController {
     
-    let viewModel = DetailsViewModel()
-    private var id: Int? = nil
+    init(viewModel: DetailsViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    let viewModel: DetailsViewModel
     
     private enum Layout {
         static let detailsLabelLeftConstraintValue = CGFloat(32)
@@ -65,9 +86,7 @@ final class DetailsViewController: UIViewController {
     }()
     
     @objc private func didButtonClick(_ sender: UIButton) {
-        loadingView.start()
-        guard let id = self.id else { return }
-        fetchCharacterData(id: id)
+        viewModel.onRetryButtonClick()
     }
     
     private func setupLayout() {
@@ -102,7 +121,7 @@ final class DetailsViewController: UIViewController {
         loadingView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
 
-    private func setupData(_ model: DetailsViewModel.Model) {
+    private func setupData(_ model: DetailsViewCharacter) {
         detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
         detailsDescriptionTextView.text = model.description
@@ -112,25 +131,22 @@ final class DetailsViewController: UIViewController {
         super.viewDidLoad()
         navigationController?.navigationBar.topItem?.backBarButtonItem = backBarButtonItem
         setupLayout()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadingView.start()
-    }
-    
-    func fetchCharacterData(id: Int) {
-        self.id = id
-        viewModel.fetchOneCharacter(id: id,
-            completition: {[weak self] item, isConnectionOk in
-                self?.setupData(item)
-                self?.loadingView.stop()
-                if !isConnectionOk {
+        viewModel.onChangeViewState = { [weak self] state in
+            switch state {
+                case .loading:
+                    self?.loadingView.start()
+                    self?.connectionErrorLabel.hide()
+                case .loaded(let data):
+                    self?.setupData(data)
+                    self?.loadingView.stop()
+                case .offline(let data):
+                    self?.setupData(data)
+                    self?.loadingView.stop()
                     self?.connectionErrorLabel.show()
-                }
-                                    },
-        failure: {[weak self] in
-            self?.loadingView.showError()
-         })
+                case .error:
+                    self?.loadingView.showError()
+            }
+        }
+        viewModel.start()
     }
 }
