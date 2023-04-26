@@ -3,9 +3,9 @@ import Alamofire
 
 enum DetailsViewState {
     case loading
-    case loaded(DetailsViewCharacter)
+    case loaded(DetailsViewController.Model)
     case error
-    case offline(DetailsViewCharacter)
+    case offline(DetailsViewController.Model)
 }
 
 struct DetailsViewCharacter: Hashable {
@@ -15,6 +15,10 @@ struct DetailsViewCharacter: Hashable {
 }
 
 final class DetailsViewController: UIViewController {
+    
+    struct Model {
+        let character: DetailsViewCharacter
+    }
     
     init(viewModel: DetailsViewModel) {
         self.viewModel = viewModel
@@ -28,11 +32,8 @@ final class DetailsViewController: UIViewController {
     let viewModel: DetailsViewModel
     
     private enum Layout {
-        static let detailsLabelLeftConstraintValue = CGFloat(32)
-        static let detailsLabelRightConstraintValue = CGFloat(-32)
-        static let detailsDescriptionTextViewLeftConstraintValue = CGFloat(32)
-        static let detailsDescriptionTextViewRightConstraintValue = CGFloat(-32)
-        static let detailsDescriptionTextViewBottomConstraintValue = CGFloat(-16)
+        static let labelAndTextLeftRightConstrintValue = CGFloat(32)
+        static let detailsDescriptionTextViewBottomConstraintValue = CGFloat(16)
         static let detailsDescriptionTextViewHeightConstraintMultiplier = CGFloat(0.4)
     }
     
@@ -97,7 +98,9 @@ final class DetailsViewController: UIViewController {
         view.addSubview(loadingView)
         view.addSubview(connectionErrorLabel)
         
-        connectionErrorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.topAnchor.constraint(
+            equalTo: view.safeAreaLayoutGuide.topAnchor
+        ).isActive = true
         connectionErrorLabel.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         connectionErrorLabel.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
@@ -106,21 +109,41 @@ final class DetailsViewController: UIViewController {
         detailsImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         detailsImageView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
-        detailsDescriptionTextView.bottomAnchor.constraint(equalTo: detailsImageView.bottomAnchor, constant: Layout.detailsDescriptionTextViewBottomConstraintValue).isActive = true
-        detailsDescriptionTextView.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsDescriptionTextViewLeftConstraintValue).isActive = true
-        detailsDescriptionTextView.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsDescriptionTextViewRightConstraintValue).isActive = true
-        detailsDescriptionTextView.heightAnchor.constraint(equalTo: detailsImageView.heightAnchor, multiplier: Layout.detailsDescriptionTextViewHeightConstraintMultiplier).isActive = true
+        detailsDescriptionTextView.bottomAnchor.constraint(
+            equalTo: detailsImageView.bottomAnchor,
+            constant: -Layout.detailsDescriptionTextViewBottomConstraintValue
+        ).isActive = true
+        detailsDescriptionTextView.leftAnchor.constraint(
+            equalTo: detailsImageView.leftAnchor,
+            constant: Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsDescriptionTextView.rightAnchor.constraint(
+            equalTo: detailsImageView.rightAnchor,
+            constant: -Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsDescriptionTextView.heightAnchor.constraint(
+            equalTo: detailsImageView.heightAnchor,
+            multiplier: Layout.detailsDescriptionTextViewHeightConstraintMultiplier
+        ).isActive = true
         
-        detailsLabel.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsLabelLeftConstraintValue).isActive = true
-        detailsLabel.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsLabelRightConstraintValue).isActive = true
-        detailsLabel.bottomAnchor.constraint(equalTo: detailsDescriptionTextView.topAnchor).isActive = true
+        detailsLabel.leftAnchor.constraint(
+            equalTo: detailsImageView.leftAnchor,
+            constant: Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsLabel.rightAnchor.constraint(
+            equalTo: detailsImageView.rightAnchor,
+            constant: -Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsLabel.bottomAnchor.constraint(
+            equalTo: detailsDescriptionTextView.topAnchor
+        ).isActive = true
         
         loadingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         loadingView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         loadingView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
-
+    
     private func setupData(_ model: DetailsViewCharacter) {
         detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
@@ -133,18 +156,18 @@ final class DetailsViewController: UIViewController {
         setupLayout()
         viewModel.onChangeViewState = { [weak self] state in
             switch state {
-                case .loading:
-                    self?.loadingView.start()
-                    self?.connectionErrorLabel.hide()
-                case .loaded(let data):
-                    self?.setupData(data)
-                    self?.loadingView.stop()
-                case .offline(let data):
-                    self?.setupData(data)
-                    self?.loadingView.stop()
-                    self?.connectionErrorLabel.show()
-                case .error:
-                    self?.loadingView.showError()
+            case .loading:
+                self?.loadingView.start()
+                self?.connectionErrorLabel.hide()
+            case .loaded(let data):
+                self?.setupData(data.character)
+                self?.loadingView.stop()
+            case .offline(let data):
+                self?.setupData(data.character)
+                self?.loadingView.stop()
+                self?.connectionErrorLabel.show()
+            case .error:
+                self?.loadingView.showError()
             }
         }
         viewModel.start()

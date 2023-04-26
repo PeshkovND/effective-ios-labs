@@ -7,15 +7,15 @@ extension UIImageView {
         self.kf.indicatorType = .activity
         self.kf.setImage(with: url,
                          options: [
-                        .cacheOriginalImage,
-                        ],
+                            .cacheOriginalImage,
+                         ],
                          completionHandler: { result in
-                            switch result {
-                            case .success(let value):
-                                self.image = value.image
-                            case .failure(_):
-                                self.image = UIImage(named: "error")
-                            }
-                        })
+            switch result {
+            case .success(let value):
+                self.image = value.image
+            case .failure(_):
+                self.image = UIImage(named: "error")
+            }
+        })
     }
 }

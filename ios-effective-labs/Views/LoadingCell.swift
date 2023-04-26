@@ -4,9 +4,7 @@ import CollectionViewPagingLayout
 final class LoadingCell: UICollectionViewCell {
     
     private enum Layout {
-        static let cardLabelLeftConstraintValue = CGFloat(16)
-        static let cardLabelBottomConstraintValue = CGFloat(-16)
-        static let cardLabelRightConstraintValue = CGFloat(-16)
+        static let containerWidthMultiplier = CGFloat(0.8)
     }
     
     private let cardContainerView: UIView = {
@@ -89,23 +87,45 @@ final class LoadingCell: UICollectionViewCell {
         
         cardContainerLoadingView.addSubview(activityIndicator)
         
-        cardContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.8).isActive = true
+        cardContainerView.widthAnchor.constraint(
+            equalTo: contentView.widthAnchor,
+            multiplier: Layout.containerWidthMultiplier
+        ).isActive = true
         cardContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         cardContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         cardContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
-        cardContainerLoadingView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
-        cardContainerLoadingView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
-        cardContainerLoadingView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
-        cardContainerLoadingView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
+        cardContainerLoadingView.leftAnchor.constraint(
+            equalTo: cardContainerView.leftAnchor
+        ).isActive = true
+        cardContainerLoadingView.rightAnchor.constraint(
+            equalTo: cardContainerView.rightAnchor
+        ).isActive = true
+        cardContainerLoadingView.topAnchor.constraint(
+            equalTo: cardContainerView.topAnchor
+        ).isActive = true
+        cardContainerLoadingView.bottomAnchor.constraint(
+            equalTo: cardContainerView.bottomAnchor
+        ).isActive = true
         
-        cardContainerErrorView.leftAnchor.constraint(equalTo: cardContainerView.leftAnchor).isActive = true
-        cardContainerErrorView.rightAnchor.constraint(equalTo: cardContainerView.rightAnchor).isActive = true
-        cardContainerErrorView.topAnchor.constraint(equalTo: cardContainerView.topAnchor).isActive = true
-        cardContainerErrorView.bottomAnchor.constraint(equalTo: cardContainerView.bottomAnchor).isActive = true
+        cardContainerErrorView.leftAnchor.constraint(
+            equalTo: cardContainerView.leftAnchor
+        ).isActive = true
+        cardContainerErrorView.rightAnchor.constraint(
+            equalTo: cardContainerView.rightAnchor
+        ).isActive = true
+        cardContainerErrorView.topAnchor.constraint(
+            equalTo: cardContainerView.topAnchor
+        ).isActive = true
+        cardContainerErrorView.bottomAnchor.constraint(
+            equalTo: cardContainerView.bottomAnchor
+        ).isActive = true
         
-        activityIndicator.centerXAnchor.constraint(equalTo: cardContainerLoadingView.centerXAnchor).isActive = true
-        activityIndicator.centerYAnchor.constraint(equalTo: cardContainerLoadingView.centerYAnchor).isActive = true
+        activityIndicator.centerXAnchor.constraint(
+            equalTo: cardContainerLoadingView.centerXAnchor
+        ).isActive = true
+        activityIndicator.centerYAnchor.constraint(
+            equalTo: cardContainerLoadingView.centerYAnchor).isActive = true
         
         errorLabel.centerXAnchor.constraint(equalTo: cardContainerErrorView.centerXAnchor).isActive = true
         errorLabel.centerYAnchor.constraint(equalTo: cardContainerErrorView.centerYAnchor).isActive = true
@@ -114,7 +134,9 @@ final class LoadingCell: UICollectionViewCell {
         
         reloadButton.centerXAnchor.constraint(equalTo: errorLabel.centerXAnchor).isActive = true
         reloadButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor).isActive = true
-        reloadButton.widthAnchor.constraint(equalToConstant: reloadButton.intrinsicContentSize.width).isActive = true
+        reloadButton.widthAnchor.constraint(
+            equalToConstant: reloadButton.intrinsicContentSize.width
+        ).isActive = true
     }
 }
 

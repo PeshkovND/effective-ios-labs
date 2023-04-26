@@ -5,20 +5,35 @@ protocol MainViewModel: AnyObject {
     
     var onChangeViewState: ((MainViewState) -> Void)? { get set }
     func start()
-    func paggingUpdate()
+    func onLastCellVisible()
     func onPullToRefresh()
     func onCellButtonClick()
     func onRetryButtonClick()
+    func getAllDataCount() -> Int
+    func getLocalDataCount() -> Int
+    func getHeroes() -> [MainViewCharacter]
 }
 
 final class MainViewModelImpl: MainViewModel {
-    var offset = 0
-    var heroes: [MainViewCharacter] = []
-    var allCount = 0
+    private var offset = 0
+    private var heroes: [MainViewCharacter] = []
+    private var allCount = 0
     
     var onChangeViewState: ((MainViewState) -> Void)?
     
     private let repository: CharactersRepository
+    
+    func getAllDataCount() -> Int {
+        return self.allCount
+    }
+    
+    func getLocalDataCount() -> Int {
+        return self.heroes.count
+    }
+    
+    func getHeroes() -> [MainViewCharacter] {
+        return self.heroes
+    }
     
     init(repository: CharactersRepository) {
         self.repository = repository
@@ -28,7 +43,7 @@ final class MainViewModelImpl: MainViewModel {
         fetchCharacters()
     }
     
-    func paggingUpdate() {
+    func onLastCellVisible() {
         fetchCharacters()
     }
     
@@ -36,6 +51,8 @@ final class MainViewModelImpl: MainViewModel {
         self.offset = 0
         self.heroes = []
         self.allCount = 0
+        self.onChangeViewState?(.loaded(MainViewController.Model(characters: self.heroes,
+                                                                 count: self.allCount)))
         fetchCharacters()
     }
     
@@ -53,44 +70,41 @@ final class MainViewModelImpl: MainViewModel {
         } else {
             onChangeViewState?(.updating)
         }
-        repository.fetchCharactersList(offset: self.offset, closure:
-                                        {[weak self] result in
-                                            switch result {
-                                                case .success(let results):
-                                                    self?.allCount = results.count
-                                                    guard let heroes = self?.heroes else { return }
-                                                    guard let allCount = self?.allCount else { return }
-                                                    guard let offset = self?.offset else { return }
-                                                    let resData = heroes + results.data
-                                                    if (results.isOnline){
-                                                        if(offset != 0) {
-                                                            self?.heroes = resData
-                                                            self?.onChangeViewState?(.updated(data: resData, allDataCount: allCount, localDataCount: resData.count))
-                                                        }
-                                                        else {
-                                                            self?.heroes = resData
-                                                            self?.onChangeViewState?(.loaded(data: resData, allDataCount: allCount, localDataCount: resData.count))}
-                                                    }
-                                                    else {
-                                                        if (offset != 0) {
-                                                            self?.onChangeViewState?(.updatingError)
-                                                            self?.offset -= 10
-                                                        }
-                                                        else {
-                                                            self?.heroes = resData
-                                                            self?.onChangeViewState?(.offline(data: resData, allDataCount: allCount, localDataCount: resData.count))
-                                                        }
-                                                    }
-                                                    self?.offset += 10
-                                                case .failure:
-                                                    guard let heroes = self?.heroes else { return }
-                                                if heroes.count == 0 {
-                                                        self?.onChangeViewState?(.error)
-                                                    }
-                                                else {
-                                                    self?.onChangeViewState?(.updatingError)
-                                                }
-                                            }
-        })
+        repository.fetchCharactersList(offset: self.offset) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let results):
+                self.allCount = results.count
+                let resData = self.heroes + results.characters
+                if(self.offset != 0) {
+                    self.heroes = resData
+                    self.onChangeViewState?(.updated(MainViewController.Model(characters: resData,
+                                                                              count: self.allCount)))
+                }
+                else {
+                    self.heroes = resData
+                    self.onChangeViewState?(.loaded(MainViewController.Model(characters: resData,
+                                                                             count: self.allCount)))}
+                self.offset += 10
+            case .failure(let error as MyCustomError):
+                switch error {
+                case .offlineMainViewData(let result):
+                    let resData = self.heroes + result.characters
+                    self.heroes = resData
+                    self.allCount = resData.count
+                    self.onChangeViewState?(.offline(
+                        MainViewController.Model(characters: resData, count: resData.count)))
+                case .offlineDetailsViewData(_):
+                    break
+                }
+            case .failure(_):
+                if self.heroes.count == 0 {
+                    self.onChangeViewState?(.error)
+                }
+                else {
+                    self.onChangeViewState?(.updatingError)
+                }
+            }
+        }
     }
 }

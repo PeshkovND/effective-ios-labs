@@ -56,7 +56,7 @@ final class LoadingView: UIView {
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         return activityIndicator
     }()
-        
+    
     
     func start() {
         UIView.animate(withDuration: 0.5) {
@@ -79,7 +79,7 @@ final class LoadingView: UIView {
             self.errorView.alpha = 1
         }
     }
-
+    
     private func setLayut() {
         addSubview(blurEffectView)
         blurEffectView.contentView.addSubview(errorView)
@@ -113,8 +113,10 @@ final class LoadingView: UIView {
         
         reloadButton.centerXAnchor.constraint(equalTo: errorLabel.centerXAnchor).isActive = true
         reloadButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor).isActive = true
-        reloadButton.widthAnchor.constraint(equalToConstant: reloadButton.intrinsicContentSize.width).isActive = true
-
+        reloadButton.widthAnchor.constraint(
+            equalToConstant: reloadButton.intrinsicContentSize.width
+        ).isActive = true
+        
         activityIndicator.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor).isActive = true
         activityIndicator.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor).isActive = true
     }
