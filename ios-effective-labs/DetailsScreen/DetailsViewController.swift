@@ -1,17 +1,39 @@
 import UIKit
 import Alamofire
 
+enum DetailsViewState {
+    case loading
+    case loaded(DetailsViewController.Model)
+    case error
+    case offline(DetailsViewController.Model)
+}
+
+struct DetailsViewCharacter: Hashable {
+    let imageUrl: URL?
+    let name: String
+    let description: String
+}
+
 final class DetailsViewController: UIViewController {
     
-    let viewModel = DetailsViewModel()
-    private var id: Int? = nil
+    struct Model {
+        let character: DetailsViewCharacter
+    }
+    
+    init(viewModel: DetailsViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    let viewModel: DetailsViewModel
     
     private enum Layout {
-        static let detailsLabelLeftConstraintValue = CGFloat(32)
-        static let detailsLabelRightConstraintValue = CGFloat(-32)
-        static let detailsDescriptionTextViewLeftConstraintValue = CGFloat(32)
-        static let detailsDescriptionTextViewRightConstraintValue = CGFloat(-32)
-        static let detailsDescriptionTextViewBottomConstraintValue = CGFloat(-16)
+        static let labelAndTextLeftRightConstrintValue = CGFloat(32)
+        static let detailsDescriptionTextViewBottomConstraintValue = CGFloat(16)
         static let detailsDescriptionTextViewHeightConstraintMultiplier = CGFloat(0.4)
     }
     
@@ -65,9 +87,7 @@ final class DetailsViewController: UIViewController {
     }()
     
     @objc private func didButtonClick(_ sender: UIButton) {
-        loadingView.start()
-        guard let id = self.id else { return }
-        fetchCharacterData(id: id)
+        viewModel.onRetryButtonClick()
     }
     
     private func setupLayout() {
@@ -78,7 +98,9 @@ final class DetailsViewController: UIViewController {
         view.addSubview(loadingView)
         view.addSubview(connectionErrorLabel)
         
-        connectionErrorLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        connectionErrorLabel.topAnchor.constraint(
+            equalTo: view.safeAreaLayoutGuide.topAnchor
+        ).isActive = true
         connectionErrorLabel.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         connectionErrorLabel.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
@@ -87,22 +109,42 @@ final class DetailsViewController: UIViewController {
         detailsImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         detailsImageView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         
-        detailsDescriptionTextView.bottomAnchor.constraint(equalTo: detailsImageView.bottomAnchor, constant: Layout.detailsDescriptionTextViewBottomConstraintValue).isActive = true
-        detailsDescriptionTextView.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsDescriptionTextViewLeftConstraintValue).isActive = true
-        detailsDescriptionTextView.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsDescriptionTextViewRightConstraintValue).isActive = true
-        detailsDescriptionTextView.heightAnchor.constraint(equalTo: detailsImageView.heightAnchor, multiplier: Layout.detailsDescriptionTextViewHeightConstraintMultiplier).isActive = true
+        detailsDescriptionTextView.bottomAnchor.constraint(
+            equalTo: detailsImageView.bottomAnchor,
+            constant: -Layout.detailsDescriptionTextViewBottomConstraintValue
+        ).isActive = true
+        detailsDescriptionTextView.leftAnchor.constraint(
+            equalTo: detailsImageView.leftAnchor,
+            constant: Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsDescriptionTextView.rightAnchor.constraint(
+            equalTo: detailsImageView.rightAnchor,
+            constant: -Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsDescriptionTextView.heightAnchor.constraint(
+            equalTo: detailsImageView.heightAnchor,
+            multiplier: Layout.detailsDescriptionTextViewHeightConstraintMultiplier
+        ).isActive = true
         
-        detailsLabel.leftAnchor.constraint(equalTo: detailsImageView.leftAnchor, constant: Layout.detailsLabelLeftConstraintValue).isActive = true
-        detailsLabel.rightAnchor.constraint(equalTo: detailsImageView.rightAnchor, constant: Layout.detailsLabelRightConstraintValue).isActive = true
-        detailsLabel.bottomAnchor.constraint(equalTo: detailsDescriptionTextView.topAnchor).isActive = true
+        detailsLabel.leftAnchor.constraint(
+            equalTo: detailsImageView.leftAnchor,
+            constant: Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsLabel.rightAnchor.constraint(
+            equalTo: detailsImageView.rightAnchor,
+            constant: -Layout.labelAndTextLeftRightConstrintValue
+        ).isActive = true
+        detailsLabel.bottomAnchor.constraint(
+            equalTo: detailsDescriptionTextView.topAnchor
+        ).isActive = true
         
         loadingView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         loadingView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         loadingView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
     }
-
-    private func setupData(_ model: DetailsViewModel.Model) {
+    
+    private func setupData(_ model: DetailsViewCharacter) {
         detailsImageView.setImageUrl(url: model.imageUrl)
         detailsLabel.text = model.name
         detailsDescriptionTextView.text = model.description
@@ -112,25 +154,22 @@ final class DetailsViewController: UIViewController {
         super.viewDidLoad()
         navigationController?.navigationBar.topItem?.backBarButtonItem = backBarButtonItem
         setupLayout()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadingView.start()
-    }
-    
-    func fetchCharacterData(id: Int) {
-        self.id = id
-        viewModel.fetchOneCharacter(id: id,
-            completition: {[weak self] item, isConnectionOk in
-                self?.setupData(item)
+        viewModel.onChangeViewState = { [weak self] state in
+            switch state {
+            case .loading:
+                self?.loadingView.start()
+                self?.connectionErrorLabel.hide()
+            case .loaded(let data):
+                self?.setupData(data.character)
                 self?.loadingView.stop()
-                if !isConnectionOk {
-                    self?.connectionErrorLabel.show()
-                }
-                                    },
-        failure: {[weak self] in
-            self?.loadingView.showError()
-         })
+            case .offline(let data):
+                self?.setupData(data.character)
+                self?.loadingView.stop()
+                self?.connectionErrorLabel.show()
+            case .error:
+                self?.loadingView.showError()
+            }
+        }
+        viewModel.start()
     }
 }
